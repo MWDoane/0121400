@@ -83,12 +83,14 @@ void    UnitWakeUp(void)
         extern const unsigned char TF_logo[9280];               // Spalsh Screen.
         
         I2C_AXP192          PMIC(I2C_AXP192_DEFAULT_ADDRESS, I2C);
+
 //─────────────────────────────────────────────────────────────────────────────  
 
 //────────────────────────── UNIT-CONTOL VARIABLES ────────────────────────────
 
         volatile    _Bool       INIT_PWR_UP_FLAG=SET;
         volatile    _Bool       UNIT_WUP_FLAG;
+        volatile    _Bool       UNIT_RUN_FLAG;        
         volatile    _Bool       LCD_BL_PWR_FLAG;
         volatile    _Bool       LCD_CTRL_PWR_FLAG;
         volatile    _Bool       LCD_DSP_SCR_1;
@@ -101,7 +103,7 @@ void    UnitWakeUp(void)
         portMUX_TYPE HW_TMR=portMUX_INITIALIZER_UNLOCKED;       // HW-TiMeR interrupt synchronozation initialzer.
         hw_timer_t * HW_TMR_0=NULL;                             // Setup the HW-TiMeR-0.
 
-
+        volatile    uint32_t    AUTO_SLP_TMR;
         volatile    uint8_t     PBTN_DB_TMR=CLEAR;              // Push-BuTtoN-De-Bounce-TiMeR, 1mS intervals.      (Default=0)
         volatile    uint8_t     LED_ON_TMR=CLEAR;               // LED-ON-TiMeR 1mS intervals.                      (Default=0)
         volatile    uint16_t    LCD_ON_TMR=CLEAR;               // LCD-DiSPlay-TiMeR, 1mS intervals.                (Default=0)
@@ -127,7 +129,6 @@ void    UnitWakeUp(void)
 
 //─────────────────────────── SD-LOGGER VARIABLES ─────────────────────────────
                     
-                    _Bool       SD_LGR_FLAG=CLEAR;              // SD-LoGgeR-FLAG bit.                              (Default=0)  
                     _Bool       SD_LGR_STATE=CLEAR;             // SD-LoGgeR-STATE bit.                             (Default=0)
                     char        LOG_BFR[512]={CLEAR};           // 512 byte RAM LOGging-BuFfeR.                     (Default=0)
                     uint32_t    SD_LGR_TMR=CLEAR;               // 32-Bit 1mS OPEN-LOG-TiMeR.                       (Temp. uint32_t, Default=0)
@@ -271,19 +272,19 @@ void    setup(void)                                             // Setup Functio
 //    RTC_Time.Hours   = hh;
 //    RTC_Time.Minutes = mm;
 //    RTC_Time.Seconds = ss;
-    RTC_Time.Hours   = 19;
+    RTC_Time.Hours   = 15;
     RTC_Time.Minutes = 39;
     RTC_Time.Seconds = 00;
     M5.Rtc.SetTime(&RTC_Time);
     RTC_Date.Month=01;
-    RTC_Date.Date=25;
+    RTC_Date.Date=26;
     RTC_Date.Year=2021;
     M5.Rtc.SetData(&RTC_Date);
 #endif
 
     RTC.GetTime(&RTC_Time);                                                 // Read the current Time.
     RTC.GetData(&RTC_Date);                                                 // Read the current Date.
-    #if(VCP_STAT_T)
+#if(VCP_STATE_T)
     VCP.printf("RTC Set & Enabled.\r\n");                                   // Print this to the VCP.
     VCP.print(String(RTC_Date.Month)+"-"+                                   // Print the Month '-'.
               String(RTC_Date.Date)+"-"+                                    // Print the Date '-'.
@@ -295,7 +296,7 @@ void    setup(void)                                             // Setup Functio
     if (RTC_Time.Seconds<10)                                                // Are the seconds are < 10?
       { VCP.print('0'); }                                                   // Print leading '0' for seconds.
     VCP.print(String(RTC_Time.Seconds)+"\r\n");                             // Else, print seconds.
-    #endif    
+#endif    
 #endif              
 
 //─────────────────────────────────────────────────────────────────────────────
@@ -307,7 +308,7 @@ void    setup(void)                                             // Setup Functio
 #if(DSP_SPLASH_T)
 //    LCD_CTRL_PWR_FLAG=SET;    
     LCD.begin();
-    #if(VCP_STAT_T)
+    #if(VCP_STATE_T)
         VCP.println("Display Enabled.");
     #endif    
     delay(500);
@@ -336,7 +337,9 @@ void    setup(void)                                             // Setup Functio
 #if(SD_LOGGER_T)
     SD_LGR.begin(115200,SERIAL_8N1,RXI_FROM_LGR,TXO_TO_LGR);
     delay(250);
+#if(VCP_STATE_T)    
     VCP.print("Logger Enabled.\r\n");
+#endif
     SD_LGR_STATE=CLEAR;                                         // CLEAR the SD-LoGgeR-STATE.
     SD_LGR_TMR=(millis()+SD_LGR_TME);
     while(millis()<SD_LGR_TMR)                                  // Wait until OPENLOG response with a '<' character.
@@ -346,7 +349,9 @@ void    setup(void)                                             // Setup Functio
             if(SD_LGR.read()=='<')                              // Did we get a ready response?
             {   
                 SD_LGR_STATE=SET;                               // If so, SET the SD-LoGgeR-STATE.
+#if(VCP_STATE_T)                
                 VCP.print("SD Ready.\r\n");                
+#endif                
                 break;                                          // and exit.
             }
         }      
@@ -366,7 +371,9 @@ void    setup(void)                                             // Setup Functio
                 if(SD_LGR.read()=='>')                              // Did we get a Command ready response?
                 {   
                     SD_LGR_STATE=SET;                               // If so, SET the SD-LoGgeR-STATE.
+#if(VCP_STATE_T)
                     VCP.print("SD Entering Command Mode...\r\n");                                    
+#endif
                     break;                                          // and exit.
                 }                                 
             }    
@@ -385,7 +392,9 @@ void    setup(void)                                             // Setup Functio
                 if(SD_LGR.read()=='<')                              // Did we get a Data ready response?
                 {
                     SD_LGR_STATE=SET;                               // If so, SET the SD-LoGgeR-STATE.
+#if(VCP_STATE_T)                    
                     VCP.print("SD Ready to receive data.\r\n");                                    
+#endif                    
                     break;                                          // and exit.
                 }                    
             }

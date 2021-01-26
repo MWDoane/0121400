@@ -73,11 +73,17 @@ Returns:        Nothing.
 void    IRAM_ATTR BTN_CHK_ISR(void)
 {   
     portENTER_CRITICAL(&GPIO_SYNC);
-/*
+
 //    if(PBTN_DB_TMR!=CLEAR)
 //    {
-        if(digitalRead(PBTN_F)==LOW)
+        if(!digitalRead(PBTN_F))
         {
+            if(!LCD_BL_PWR_FLAG)
+            {
+                LCD_ON_TMR=LCD_ON_TME;                
+                portEXIT_CRITICAL(&GPIO_SYNC);        
+                return;
+            }
             if(PULSE_CNT)
             {
                 PULSE_CNT=CLEAR;  
@@ -85,15 +91,15 @@ void    IRAM_ATTR BTN_CHK_ISR(void)
                 LCD_ON_TMR=LCD_ON_TME;
                 String EventCount=String(PULSE_CNT);            
                 LCD.drawString(EventCount+"        ",55,25,2);   
-                PBTN_DB_TMR=PBTN_DB_TME;
+//                PBTN_DB_TMR=PBTN_DB_TME;
             }
         }
-        if(digitalRead(PBTN_T)==LOW)
-        {
-            LCD_ON_TMR=LCD_ON_TME;              
-        }
+        
+        if(!digitalRead(PBTN_T))
+        {   LCD_ON_TMR=LCD_ON_TME;  }
+        
 //    }
-*/
+
     portEXIT_CRITICAL(&GPIO_SYNC);        
     return;
 }
