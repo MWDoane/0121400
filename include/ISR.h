@@ -46,8 +46,8 @@
     extern  volatile    uint8_t         PBTN_DB_TMR;                        // Push-BuTtoN-De-Bounce-TiMeR, 1mS intervals.      (Default=0)
     extern  volatile    uint8_t         LED_ON_TMR;                         // LED-ON-TiMeR, 1mS intervals.                     (Default=0)
     extern  volatile    uint16_t        LCD_ON_TMR;                         // LCD-ON-TiMeR, 1mS intervals.                     (Default=0)
-
-    extern  volatile    uint32_t        UnitControl;
+    extern  volatile    _Bool           LCD_BL_PWR_FLAG;
+    extern  volatile    _Bool           LCD_CTRL_PWR_FLAG;
 
     extern              I2C_AXP192      PMIC;    
     extern              M5Display       LCD;
@@ -57,7 +57,7 @@
 //────────────────────────────── ISR FUNCTIONS ────────────────────────────────
 
     void IRAM_ATTR SAL_CHK_ISR(void);  
-//    void IRAM_ATTR SYS_CHK_ISR(void);
+    void IRAM_ATTR SYS_CHK_ISR(void);
     void IRAM_ATTR TMR_CHK_ISR(void);  
 
 #endif

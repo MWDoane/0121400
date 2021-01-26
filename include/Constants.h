@@ -54,7 +54,7 @@
 #define     DSP_SPLASH_T    (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control to Display the Splash Screen.
 #define     DSP_MAIN_SCR    (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control to Display the Main SCReen.
 #define     DEBUG_IO_T      (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control DEBUG-Test-point-Inputs/Outputs.
-#define     SD_LOGGER_T     (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control of the SD Data-LOGGER-Testing.
+#define     SD_LOGGER_T     (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control of the SD Data-LOGGER-Testing.
 #define     RTC_T           (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control of the RTC-Testing.
 #define     SET_RTC_T       (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control of Setting-RTC-Testing.
 #define     IMU_T           (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control of IMU-Testing.
@@ -111,8 +111,8 @@
 
 #define     PBTN_DB_TME         (100u)                      // Push-BuTtoN-De-Bouce-TiME in mS.
 #define     LED_ON_TME          (15u)                       // LED-ON-TiME in mS.
-#define     LCD_ON_INIT_TME     (60000u)                    // LCD-DiSPlay-TiME in mS.
-#define     LCD_ON_TME          (5000u)                     // LCD-DiSPlay-TiME in mS.
+#define     LCD_ON_INIT_TME     (3000u)                    // LCD-DiSPlay-TiME in mS.
+#define     LCD_ON_TME          (3000u)                    // LCD-DiSPlay-TiME in mS.
 #define     SD_LGR_TME          (250u) 
 
 //──────────────────── VCP-Command DEFINITIONS ──────────────────────
@@ -125,7 +125,7 @@
 #define     LCD_BL_DIM          (2700u)                     // 2.700V for a DIM-LCD-Back-Light.
 #define     LCD_BL_BRT          (2950u)                     // 2.950V for a BRighT-LCD-Back-Light.
 #define     LCD_BL_OFF          (OFF)                       // Turn the LCD-Back-Light-OFF.
-#define     LCD_CTRL_ON         (3000u)                     // 2.700V to turn ON the LCD-ConTRoLler.
+#define     LCD_CTRL_ON         (2700u)                     // 2.700V to turn ON the LCD-ConTRoLler.
 #define     LCD_CTRL_OFF        (OFF)                       // Turn the LCD-ConTRoLler-OFF.
 
 //─────────────────────── PMU DEFINITIONS ───────────────────────────
@@ -152,19 +152,11 @@
 
 //─────────────────── UNIT-CONTROL DEFINITIONS ──────────────────────
 
-#define     INIT_PWR_UP         (0u)
-#define     UNIT_WUP            (1u)
-#define     LCD_BL_PWR_FLAG     (2u)
-#define     LCD_CTRL_PWR_FLAG   (3u)
-#define     LCD_BL_FLAG         (4u)
-#define     LCD_DSP_SCR_1       (5u)
-#define     LCD_DSP_SCR_2       (6u)
-#define     LCD_DSP_SCR_3       (7u)
-
+/*
 #define     SAL_sPULSE_DET      (8u)
 #define     SAL_WHR_MODE        (9u)
 #define     SAL_CHR_MODE        (10u)
-
+*/
 
 
 //──────────────────── DEEP-SLEEP DEFINITIONS ───────────────────────

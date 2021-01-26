@@ -35,9 +35,7 @@
 
 //──────────────────────── RTC-DEEP-SLEEP VARIABLES ───────────────────────────
 
-RTC_DATA_ATTR   uint32_t    DS_PULSE_CNT;
-RTC_DATA_ATTR   uint32_t    DS_PRV_PULSE_CNT;
-RTC_DATA_ATTR   uint8_t     DS_OP_MODE;
+    RTC_DATA_ATTR   _Bool   ULP_INIT_PWR_UP_FLAG;
 
 //─────────────────────────────────────────────────────────────────────────────  
 
@@ -88,15 +86,14 @@ void    UnitWakeUp(void)
 //─────────────────────────────────────────────────────────────────────────────  
 
 //────────────────────────── UNIT-CONTOL VARIABLES ────────────────────────────
-/*
-                    _Bool       INIT_PWR_UP_FLAG=SET;
-                    _Bool       UNIT_WUP_FLAG;
-                    _Bool       LCD_BL_PWR_FLAG;
-                    _Bool       LCD_CTRL_PWR_FLAG;
-                    _Bool       LCD_DSP_SCR_1;
-                    _Bool       LCD_DSP_SCR_2;
-                    _Bool       LCD_DSP_SCR_3;
-*/
+
+        volatile    _Bool       INIT_PWR_UP_FLAG=SET;
+        volatile    _Bool       UNIT_WUP_FLAG;
+        volatile    _Bool       LCD_BL_PWR_FLAG;
+        volatile    _Bool       LCD_CTRL_PWR_FLAG;
+        volatile    _Bool       LCD_DSP_SCR_1;
+        volatile    _Bool       LCD_DSP_SCR_2;
+        volatile    _Bool       LCD_DSP_SCR_3;
 
 //─────────────────────────── ISR TIMER VARIABLES ─────────────────────────────
 
@@ -144,18 +141,7 @@ void    UnitWakeUp(void)
                     uint32_t    RTC_CHK_TMR=CLEAR;              // 32-Bit 1mS OPEN-LOG-TiMeR.                       (Temp. uint32_t, Default=0)
 
 //─────────────────────────────────────────────────────────────────────────────  
-
 //────────────────────────────── IMU VARIABLES ────────────────────────────────
-
-//─────────────────────────────────────────────────────────────────────────────  
-
-//──────────────────────── GENERAL UNIT DEFINITIONS ───────────────────────────
-
-        volatile    uint32_t    UnitControl=INIT_PWR_UP;        // Unit-Status control & status.
-
-
-//─────────────────────────────────────────────────────────────────────────────
-
 //─────────────────────────────────────────────────────────────────────────────  
 //───────────────────────────── RTC DEFINITIONS ───────────────────────────────
 //─────────────────────────────────────────────────────────────────────────────  
@@ -166,7 +152,7 @@ void    UnitWakeUp(void)
 //───────────────────────── ISR FUNCTION PROTOTYPES ───────────────────────────
 
 void    IRAM_ATTR   SAL_CHK_ISR(void);                          // CHecK-SALutron-Interrupt-Service-Routine.  
-//void    IRAM_ATTR   SYS_CHK_ISR(void);                          // CHecK SYStem-Interrupt-Service Routine.
+void    IRAM_ATTR   SYS_CHK_ISR(void);                          // CHecK SYStem-Interrupt-Service Routine.
 void    IRAM_ATTR   BTN_CHK_ISR(void);                          // CHecK BuTtoN-Interrupt-Service-Routine.
 void    IRAM_ATTR   TMR_CHK_ISR(void);                          // CHecK TiMeR-Interrupt-Service-Routine.
 
@@ -174,17 +160,17 @@ void    IRAM_ATTR   TMR_CHK_ISR(void);                          // CHecK TiMeR-I
 
 //────────────────────────── FUNCTION PROTOTYPES ──────────────────────────────
 
+void    DisplaySplash(void);
+void    DisplayDefault(void);
+float   Calculate_HR(void);                                     // Calculate the current Heat-Rate in BPM.
 void    Logger_Init(void);                                      // INITialize SD-Logger.
 void    Log_Data(void);                                         // Write data to the SD-LOGger.
-float   Calculate_HR(void);                                     // Calculate the current Heat-Rate in BPM.
 void    WiFi_BT_ShutDown(void);                                 // Turns both WiFi & BlueTooth radio's off.
 void    Unit_ULP_WakeUp(void);                                  // Prepare Unit after DeepSleep to run.
 void    Unit_ULP_DeepSleep(void);                               // Prepare Unit to enter DeepSleep.
 void    setup(void)                                             // Setup Function Declaration.
 {
     
-//if(bitRead(UnitControl,INIT_PWR_UP))
-
 //──────────────────────── M5STICK-C INITIALIZATION ───────────────────────────
 
     M5.begin(CLEAR,CLEAR,CLEAR);
@@ -206,9 +192,9 @@ void    setup(void)                                             // Setup Functio
 
 //──────────────────── INTERRUPT SET-UP INITIALIZATION ────────────────────────
 
-    if(bitRead(UnitControl,INIT_PWR_UP)==SET)
+    if(INIT_PWR_UP_FLAG)
     {   attachInterrupt(SAL_PULSE,SAL_CHK_ISR,RISING);  }       // CHeck SALutron-sPULSE Interrupt input.
-//    attachInterrupt(SYS_INT,SYS_CHK_ISR,FALLING);               // CHeck SYStem shared Interrupt input.
+    attachInterrupt(SYS_INT,SYS_CHK_ISR,FALLING);               // CHeck SYStem shared Interrupt input.
     attachInterrupt(PBTN_F,BTN_CHK_ISR,FALLING);                // CHeck Push BuTtoN-Front Interrupt input.
     attachInterrupt(PBTN_T,BTN_CHK_ISR,FALLING);                // CHecK Push BuTtoN-Top Interrupt input.
 
@@ -279,18 +265,18 @@ void    setup(void)                                             // Setup Functio
     PrevSecond=-1;
 
 #if(SET_RTC_T)
-    hh = conv2d(__TIME__), 
-    mm = conv2d(__TIME__ + 3), 
-    ss = conv2d(__TIME__ + 6);                                              // Get H, M, S from compile time
-    RTC_Time.Hours   = hh;
-    RTC_Time.Minutes = mm;
-    RTC_Time.Seconds = ss;
-//    RTC_Time.Hours   = 17;
-//    RTC_Time.Minutes = 47;
-//    RTC_Time.Seconds = 30;
+//    uint8_t hh = conv2d(__TIME__), 
+//    uint8_t mm = conv2d(__TIME__ + 3), 
+//    uint8_t ss = conv2d(__TIME__ + 6);                                              // Get H, M, S from compile time
+//    RTC_Time.Hours   = hh;
+//    RTC_Time.Minutes = mm;
+//    RTC_Time.Seconds = ss;
+    RTC_Time.Hours   = 19;
+    RTC_Time.Minutes = 39;
+    RTC_Time.Seconds = 00;
     M5.Rtc.SetTime(&RTC_Time);
     RTC_Date.Month=01;
-    RTC_Date.Date=24;
+    RTC_Date.Date=25;
     RTC_Date.Year=2021;
     M5.Rtc.SetData(&RTC_Date);
 #endif
@@ -319,18 +305,16 @@ void    setup(void)                                             // Setup Functio
 //    DisplaySplash();
 
 #if(DSP_SPLASH_T)
-    LCD_ON_TMR=LCD_ON_INIT_TME;
-    delay(10);
+//    LCD_CTRL_PWR_FLAG=SET;    
     LCD.begin();
     #if(VCP_STAT_T)
         VCP.println("Display Enabled.");
     #endif    
     delay(500);
-    bitSet(UnitControl,LCD_CTRL_PWR_FLAG);
     LCD.setRotation(1);
     LCD.fillScreen(BLUE);
     PMIC.setLDO2(LCD_BL_BRT);
-    bitSet(UnitControl,LCD_BL_PWR_FLAG);    
+    LCD_BL_PWR_FLAG=SET;        
     LCD.pushImage(0, 12, logoWidth, logoHeight, (uint16_t *)TF_logo);
     LCD.setTextColor(YELLOW);
     delay(3000); 
@@ -424,17 +408,16 @@ void    setup(void)                                             // Setup Functio
     LCD.drawString("Mode:",10,40,2);
     LCD.drawString("--       ",50,40,2);
     PRV_PULSE_CNT=PULSE_CNT;
-    bitClear(UnitControl,SAL_WHR_MODE);
-    bitClear(UnitControl,SAL_CHR_MODE);
     CHR=CLEAR;
     WHR=CLEAR;
     HR_Value=CLEAR;
     SAL_SIG_DET=CLEAR;
     SAL_ELAPSED_TME=CLEAR;
-    if(bitRead(UnitControl,INIT_PWR_UP))
-    {   attachInterrupt(SAL_PULSE,SAL_CHK_ISR,RISING);  }       // CHeck SALutron-sPULSE Interrupt input.
-    bitClear(UnitControl,INIT_PWR_UP);
-    LCD_ON_TMR=LCD_ON_TME;
+    if(INIT_PWR_UP_FLAG)
+    {   attachInterrupt(SAL_PULSE,SAL_CHK_ISR,RISING);          // CHeck SALutron-sPULSE Interrupt input.
+        LCD_ON_TMR=LCD_ON_INIT_TME;
+        INIT_PWR_UP_FLAG=CLEAR;        
+    }
 #endif    
 
 //─────────────────────────────────────────────────────────────────────────────

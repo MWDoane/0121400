@@ -34,30 +34,45 @@
 
 #include    "Constants.h"                                                   // Include Gloabal constants.
 
-//──────────────────────────── DEVICE VARIABLES ───────────────────────────────
+//───────────────────────────── UNIT VARIABLES ────────────────────────────────
 
-extern  volatile    uint32_t    UnitControl;                                
+extern  volatile    _Bool       INIT_PWR_UP_FLAG;
+extern  volatile    _Bool       UNIT_WUP_FLAG;
+extern  volatile    _Bool       LCD_BL_PWR_FLAG;
+extern  volatile    _Bool       LCD_CTRL_PWR_FLAG;
+extern  volatile    _Bool       LCD_DSP_SCR_1;
+extern  volatile    _Bool       LCD_DSP_SCR_2;
+extern  volatile    _Bool       LCD_DSP_SCR_3;
+
 extern  volatile    uint32_t    PRV_PULSE_CNT;                              // PReVious-PULSE-CouNT.
 extern  volatile    uint32_t    PULSE_CNT;                                  // Accumulated PULSE-CouNT.
-extern  volatile    uint32_t    SAL_ELAPSED_TME;                            // 32-Bit, ELAPSED-TiME in µS.                      (Default=0)
+extern  volatile    uint32_t    SAL_ELAPSED_TME;                            // 32-Bit, ELAPSED-TiME in µS.                      
+extern  volatile    _Bool       SAL_SIG_DET;                                // SALutron SIGnal-DETection.
+extern              _Bool       CHR;                                        // State of the SALutron-MODE line.              
+extern              _Bool       WHR;                                        // State of the SALutron-MODE line.                 
 extern              float       HR_Value;                                   // Calculated Heart-Rate.
 
-extern              M5Display           LCD;
-extern              RTC_TimeTypeDef     RTC_Time;
-extern              RTC_DateTypeDef     RTC_Date;
-extern              I2C_AXP192          PMIC;
+extern  volatile    uint16_t    LCD_ON_TMR;                                 // LCD-DiSPlay-TiMeR, 1mS intervals.                (Default=0)
 
-//──────────────────────────── DEVICE FUNCTIONS ───────────────────────────────
 
-extern  void    SAL_CHK_ISR(void);
-extern  void    Logger_Init(void);                                      // INITialize SD-Logger.
-extern  void    Log_Data(void);                                         // Write data to the SD-LOGger.
-extern  float   Calculate_HR(void);                                     // Calculate the current Heat-Rate in BPM.
-extern  void    WiFi_BT_ShutDown(void);                                 // Turns both WiFi & BlueTooth radio's off.
-extern  void    Unit_ULP_WakeUp(void);                                  // Prepare Unit after DeepSleep to run.
-extern  void    Unit_ULP_DeepSleep(void);                               // Prepare Unit to enter DeepSleep.
+//────────────────────────────── UNIT CLASSES ─────────────────────────────────
 
-//extern    void    DisplaySplash(void);
-//extern    void    DisplayDefault(void);
+extern      M5Display           LCD;
+extern      RTC_TimeTypeDef     RTC_Time;
+extern      RTC_DateTypeDef     RTC_Date;
+extern      I2C_AXP192          PMIC;
+
+//───────────────────────────── UNIT FUNCTIONS ────────────────────────────────
+
+//extern  void    SAL_CHK_ISR(void);
+extern  void    Logger_Init(void);                                          // INITialize SD-Logger.
+extern  void    Log_Data(void);                                             // Write data to the SD-LOGger.
+extern  float   Calculate_HR(void);                                         // Calculate the current Heat-Rate in BPM.
+extern  void    WiFi_BT_ShutDown(void);                                     // Turns both WiFi & BlueTooth radio's off.
+extern  void    Unit_ULP_WakeUp(void);                                      // Prepare Unit after DeepSleep to run.
+extern  void    Unit_ULP_DeepSleep(void);                                   // Prepare Unit to enter DeepSleep.
+
+extern  void    DisplaySplash(void);
+extern  void    DisplayDefault(void);
 
 #endif

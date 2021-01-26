@@ -53,8 +53,7 @@ void loop(void)
       {
         if((PRV_PULSE_CNT=PULSE_CNT))
         {
-//          if(SAL_SIG_DET)
-          if(bitRead(UnitControl,SAL_sPULSE_DET))
+          if(SAL_SIG_DET)
           {
             LCD.drawString("Pulse Rate:",10,10,2);
             LCD.drawString("--   ",85,10,2);
@@ -64,13 +63,10 @@ void loop(void)
             LCD.drawString("Mode:",10,40,2);
             LCD.drawString("--       ",50,40,2);
             PRV_PULSE_CNT=PULSE_CNT;
-            bitClear(UnitControl,SAL_WHR_MODE);
-            bitClear(UnitControl,SAL_CHR_MODE);
             CHR=CLEAR;
             WHR=CLEAR;
             HR_Value=CLEAR;
             SAL_SIG_DET=CLEAR;
-            bitClear(UnitControl,SAL_sPULSE_DET);            
             SAL_ELAPSED_TME=CLEAR;
           }
         }  
@@ -84,21 +80,17 @@ void loop(void)
           LCD.drawString("Count:",10,25,2);
           LCD.drawString("Mode:",10,40,2);
 
-//          if(WHR)
-          if(bitRead(UnitControl,SAL_WHR_MODE))
+          if(WHR)
           {
             LCD.drawString("--   ",85,10,2);
             String EventCount=String(PULSE_CNT);                   
             LCD.drawString(EventCount+"     ",55,25,2);
             LCD.drawString("Wireless",50,40,2);
-            bitClear(UnitControl,SAL_WHR_MODE);
-            bitSet(UnitControl,SAL_CHR_MODE);
             CHR=SET;  WHR=CLEAR;            
             PRV_PULSE_CNT=PULSE_CNT;                    
           }
 
-//          else if(!WHR)
-          else if(!bitRead(UnitControl,SAL_WHR_MODE))
+          else if(!WHR)
           {
             String PulseRate=String(HR_Value,0);
             if(!(PULSE_CNT>=(PRV_PULSE_CNT+3)))
@@ -108,8 +100,6 @@ void loop(void)
             String EventCount=String(PULSE_CNT);          
             LCD.drawString(EventCount+"     ",55,25,2);
             LCD.drawString("Contact ",50,40,2);
-            bitClear(UnitControl,SAL_WHR_MODE);
-            bitSet(UnitControl,SAL_CHR_MODE);
             CHR=SET;  WHR=CLEAR;
           }  
         }
@@ -130,8 +120,6 @@ void loop(void)
           LCD.drawString(EventCount+"     ",55,25,2);
           LCD.drawString("Mode:",10,40,2);
           LCD.drawString("Wireless",50,40,2);      
-          bitSet(UnitControl,SAL_WHR_MODE);
-          bitClear(UnitControl,SAL_CHR_MODE);
           CHR=CLEAR;  WHR=SET;        
         }
 
@@ -163,14 +151,11 @@ void loop(void)
           else
           {   VCP.printf("%d,",(uint)HR_Value);   }
           VCP.printf("%d,",(uint)PULSE_CNT);
-//          if(WHR)
-          if(bitRead(UnitControl,SAL_WHR_MODE))
+          if(WHR)
           { VCP.print("WHR\r\n"); }
-//          if(CHR)
-          if(bitRead(UnitControl,SAL_CHR_MODE))
+          if(CHR)
           {   VCP.print("CHR\r\n");   }
-//          else if(!(CHR || WHR))
-          else if((!bitRead(UnitControl,SAL_WHR_MODE)) || (!bitRead(UnitControl,SAL_CHR_MODE)))
+          else if(!(CHR || WHR))
           {   VCP.print("-\r\n");   }
         }  
       }
@@ -181,8 +166,7 @@ void loop(void)
 //─────────────────────────────────────────────────────────────────────────────    
 
 #if(SD_LOGGER_T)
-//      if(SAL_SIG_DET)
-      if(bitRead(UnitControl,SAL_sPULSE_DET))
+      if(SAL_SIG_DET)
       {
         M5.Rtc.GetTime(&RTC_Time);                                          // Update all the RTC Time registers.
         if (RTC_Time.Seconds != PrevSecond)                                 // If current second and previous second
@@ -204,46 +188,39 @@ void loop(void)
           SD_LGR.print(String(RTC_Time.Seconds)+",");                       // Else, log the seconds.
           SD_LGR.printf("%d,",(uint)HR_Value);                              // Log the current Hear-Rate-Value.
           SD_LGR.printf("%d,",(uint)PULSE_CNT);                             // Log the current pulse count.
-//          if(WHR)
-          if(bitRead(UnitControl,SAL_WHR_MODE))
-          { SD_LGR.print("WHR"); }
-//          if(CHR)
-          if(bitRead(UnitControl,SAL_CHR_MODE))
-          {   SD_LGR.print("CHR");   }
-//          else if((!CHR)||(!WHR))
-          else if((!bitRead(UnitControl,SAL_WHR_MODE)) || (!bitRead(UnitControl,SAL_CHR_MODE)))
-            {   SD_LGR.print("-");   }
-          SD_LGR.print("\r\n");
-/*
-        {   // Simplify below.
           if(WHR)
           { SD_LGR.print("WHR"); }
-          else if(!WHR)
-          { 
-            if(CHR)
-            {   SD_LGR.print("CHR");   }
-            else if(!CHR)
+          if(CHR)
+          {   SD_LGR.print("CHR");   }
+          else if((!CHR)||(!WHR))
             {   SD_LGR.print("-");   }
-          }        
           SD_LGR.print("\r\n");
-        }   // Simplify Above.
-*/
           PrevSecond=RTC_Time.Seconds;                                      // Set previous seconds to current seconds.
         }
       }
 #endif      
       if(LCD_ON_TMR==CLEAR)                                   // Is the LCD-ON-TiMeR CLEAR?
       {                                                       // IF so,    
-          if(bitRead(UnitControl,LCD_BL_PWR_FLAG)==SET)
+          if(LCD_BL_PWR_FLAG)
           {
-              PMIC.setLDO2(LCD_BL_OFF);                       // Turn the LCD-Back-Light-OFF.
-              bitClear(UnitControl,LCD_BL_FLAG);          
+//              PMIC.setLDO2(LCD_BL_OFF);                       // Turn the LCD-Back-Light-OFF.
+              LCD_BL_PWR_FLAG=CLEAR;
           }
-          if(bitRead(UnitControl,LCD_CTRL_PWR_FLAG)==SET)
+/*
+          if(LCD_CTRL_PWR_FLAG)
           {
-              PMIC.setLDO3(LCD_CTRL_OFF);                     // Turn the LCD-Back-Light-OFF.
-              bitClear(UnitControl,LCD_CTRL_PWR_FLAG);          
+              PMIC.setLDO3(LCD_CTRL_OFF);                     // Turn the LCD-Controller-OFF.
+              LCD_CTRL_PWR_FLAG=CLEAR;
           }    
+*/
+      }
+      if(LCD_ON_TMR!=CLEAR)
+      {
+        if(!LCD_BL_PWR_FLAG)
+        {
+//          PMIC.setLDO2(LCD_BL_DIM);                 
+          LCD_BL_PWR_FLAG=SET;
+        }
       }
     } while(digitalRead(SAL_PULSE)==LOW);    
     delay(MAX_SAL_SIG_TME);

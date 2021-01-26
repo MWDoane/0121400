@@ -55,7 +55,6 @@ void    IRAM_ATTR SAL_CHK_ISR(void)
     LED_ON_TMR=LED_ON_TME;
     PULSE_CNT++;
     SAL_SIG_DET=SET;
-    bitSet(UnitControl,SAL_sPULSE_DET);
     portEXIT_CRITICAL(&GPIO_SYNC);    
     return;
 }
@@ -74,6 +73,7 @@ Returns:        Nothing.
 void    IRAM_ATTR BTN_CHK_ISR(void)
 {   
     portENTER_CRITICAL(&GPIO_SYNC);
+/*
 //    if(PBTN_DB_TMR!=CLEAR)
 //    {
         if(digitalRead(PBTN_F)==LOW)
@@ -82,26 +82,18 @@ void    IRAM_ATTR BTN_CHK_ISR(void)
             {
                 PULSE_CNT=CLEAR;  
                 PRV_PULSE_CNT=CLEAR;         
-                if((bitRead(UnitControl,LCD_BL_PWR_FLAG)==SET) && (bitRead(UnitControl,LCD_BL_PWR_FLAG)==SET))
-                {
-                    PMIC.setLDO3(2700);
-                    PMIC.setLDO2(LCD_BL_DIM);
-                    bitSet(UnitControl, LCD_BL_PWR_FLAG);
-                    bitSet(UnitControl, LCD_CTRL_PWR_FLAG);            
-                    LCD_ON_TMR=LCD_ON_TME;
-                    String EventCount=String(PULSE_CNT);            
-                    LCD.drawString(EventCount+"     ",55,25,2);   
-                    PBTN_DB_TMR=PBTN_DB_TME;
-                }
+                LCD_ON_TMR=LCD_ON_TME;
+                String EventCount=String(PULSE_CNT);            
+                LCD.drawString(EventCount+"        ",55,25,2);   
+                PBTN_DB_TMR=PBTN_DB_TME;
             }
         }
         if(digitalRead(PBTN_T)==LOW)
         {
-            pinMode(RED_LED,OUTPUT);
-            digitalWrite(RED_LED,LOW);
-            LED_ON_TMR=LED_ON_TME;
+            LCD_ON_TMR=LCD_ON_TME;              
         }
 //    }
+*/
     portEXIT_CRITICAL(&GPIO_SYNC);        
     return;
 }
@@ -117,14 +109,14 @@ Returns:        Nothing.
 
 ───────────────────────────────────────────────────────────────────────────────
 */
-/*
+
 void    IRAM_ATTR SYS_CHK_ISR(void)
 {   
     portENTER_CRITICAL(&GPIO_SYNC);
     portEXIT_CRITICAL(&GPIO_SYNC);
     return;
 }
-*/
+
 /*
 ───────────────────────────────────────────────────────────────────────────────
 TiMeR-ChecK-ISR     When the hardare timer fire an interrupt, the 1mS TiMeRs

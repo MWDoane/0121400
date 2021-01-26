@@ -117,18 +117,20 @@ void    DisplayDefault(void)
     LCD.drawString("Mode:",10,40,2);
     LCD.drawString("--       ",50,40,2);
     PRV_PULSE_CNT=PULSE_CNT;
-
-//    CHR=CLEAR;
-//    WHR=CLEAR;
+    CHR=CLEAR;
+    WHR=CLEAR;
     HR_Value=CLEAR;
-//    SAL_SIG_DET=CLEAR;
+    SAL_SIG_DET=CLEAR;
     SAL_ELAPSED_TME=CLEAR;
-//    if(DEVICE_MODE.STARTUP_MODE)
-    if(bitRead(UnitControl,INIT_PWR_UP))    
+/*
+    if(INIT_PWR_UP_FLAG)
     {   attachInterrupt(SAL_PULSE,SAL_CHK_ISR,RISING);  }       // CHeck SALutron-sPULSE Interrupt input.
-//    DEVICE_MODE.STARTUP_MODE=CLEAR;    
-    bitClear(UnitControl,INIT_PWR_UP);
-
+    if(INIT_PWR_UP_FLAG)
+    { 
+        LCD_ON_TMR=LCD_ON_INIT_TME;
+        INIT_PWR_UP_FLAG=CLEAR;        
+    }
+*/
     return;
 }
 
