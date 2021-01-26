@@ -232,13 +232,19 @@ void loop(void)
         }
       }
 #endif      
-/*
-    if(LCD_ON_TMR==CLEAR)
-    {   
-      PMIC.setLDO2(LCD_BL_OFF);
-      LCD_ON_TMR=LCD_ON_TME;
-    }
-*/
+      if(LCD_ON_TMR==CLEAR)                                   // Is the LCD-ON-TiMeR CLEAR?
+      {                                                       // IF so,    
+          if(bitRead(UnitControl,LCD_BL_PWR_FLAG)==SET)
+          {
+              PMIC.setLDO2(LCD_BL_OFF);                       // Turn the LCD-Back-Light-OFF.
+              bitClear(UnitControl,LCD_BL_FLAG);          
+          }
+          if(bitRead(UnitControl,LCD_CTRL_PWR_FLAG)==SET)
+          {
+              PMIC.setLDO3(LCD_CTRL_OFF);                     // Turn the LCD-Back-Light-OFF.
+              bitClear(UnitControl,LCD_CTRL_PWR_FLAG);          
+          }    
+      }
     } while(digitalRead(SAL_PULSE)==LOW);    
     delay(MAX_SAL_SIG_TME);
   }    
