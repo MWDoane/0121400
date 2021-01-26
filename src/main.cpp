@@ -1,5 +1,5 @@
 /*
-───────────────────────── M5 Salutron-Phantom-Detecter ────────────────────────
+───────────────────────── M5 Salutron-Phantom-Detector ────────────────────────
 
     This document contains confidential information and privileged material
     for the sole use of those authorized by True Fitness.  Any review, use,
@@ -11,7 +11,7 @@
 
 ───────────────────────────────────────────────────────────────────────────────
 
-    Project:    M5 Salutron-Phantom-Detecter (M5-SPD)
+    Project:    M5 Salutron-Phantom-Detector (M5-SPD)
     Author:     Mark Doane
     Date:       12/30/20
     File:       Main.c

@@ -1,5 +1,5 @@
 /*
-───────────────────────── M5 Salutron-Phantom-Detecter ────────────────────────
+───────────────────────── M5 Salutron-Phantom-Detector ────────────────────────
 
     This document contains confidential information and privileged material
     for the sole use of those authorized by True Fitness.  Any review, use,
@@ -11,7 +11,7 @@
 
 ───────────────────────────────────────────────────────────────────────────────
 
-    Project:    M5 Salutron-Phantom-Detecter (M5-SPD)
+    Project:    M5 Salutron-Phantom-Detector (M5-SPD)
     Author:     Mark Doane
     Date:       12/30/20
     File:       Constants.h           -Contains system constants used through the entire program.
@@ -51,8 +51,7 @@
 #define     VCP_SD_LOG_T    (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control console communications-Testing of the SD card.
 #define     VCP_STATE_T     (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control console communications-Testing.
 #define     LCD_DSP_T       (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control LCD-Display-Test functions.
-#define     DSP_LOGO_T      (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control to Display the True Fitnesss Logo.   (Graphical)
-#define     LCD_TXT_DSP_T   (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control to Display the True Fitnesss Logo.   (Plain Text)
+#define     DSP_SPLASH_T    (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control to Display the Splash Screen.
 #define     DSP_MAIN_SCR    (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control to Display the Main SCReen.
 #define     DEBUG_IO_T      (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control DEBUG-Test-point-Inputs/Outputs.
 #define     SD_LOGGER_T     (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control of the SD Data-LOGGER-Testing.
@@ -112,6 +111,7 @@
 
 #define     PBTN_DB_TME         (100u)                      // Push-BuTtoN-De-Bouce-TiME in mS.
 #define     LED_ON_TME          (15u)                       // LED-ON-TiME in mS.
+#define     LCD_ON_INIT_TME     (60000u)                    // LCD-DiSPlay-TiME in mS.
 #define     LCD_ON_TME          (5000u)                     // LCD-DiSPlay-TiME in mS.
 #define     SD_LGR_TME          (250u) 
 
@@ -125,15 +125,18 @@
 #define     LCD_BL_DIM          (2700u)                     // 2.700V for a DIM-LCD-Back-Light.
 #define     LCD_BL_BRT          (2950u)                     // 2.950V for a BRighT-LCD-Back-Light.
 #define     LCD_BL_OFF          (OFF)                       // Turn the LCD-Back-Light-OFF.
+#define     LCD_CTRL_ON         (3000u)                     // 2.700V to turn ON the LCD-ConTRoLler.
+#define     LCD_CTRL_OFF        (OFF)                       // Turn the LCD-ConTRoLler-OFF.
 
 //─────────────────────── PMU DEFINITIONS ───────────────────────────
 
+#define     SYS_PWR_ON          (3000u)                     // Turn ON SYStem-PoWeR.                                (DO NOT SET LOWER THAN 2.800V)
 #define     EXT_5V_ON           (ON)                        // Turn ON the EXTernal 5V step-up supply.
 #define     EXT_5V_OFF          (OFF)                       // Turn OFF the EXTernal 5V step-up supply.
 #define     RTC_BCKUP_ON        (ON)                        // Turn ON the RTC-BaCK-UP battery.
 #define     RTC_BCKUP_OFF       (OFF)                       // Turn OFF the RTC-BaCK-UP battery.
-#define     MIC_PWR_ON          (2800u)                     // 2.800V to PoWeR the MIC-ON.
-#define     MIC_PWR_OFF         (OFF)                       // Turn the MIC-PoWeR-OFF.
+#define     GPIO_0_ON           (2800u)                     // Turn ON GPIO-0 and set to 2.800V.
+#define     GPIO_0_OFF          (OFF)                       // Turn OFF GPIO-0.
 
 //─────────────────────── IMU DEFINITIONS ───────────────────────────
 

@@ -1,5 +1,5 @@
 /*
-───────────────────────── M5 Salutron-Phantom-Detecter ────────────────────────
+───────────────────────── M5 Salutron-Phantom-Detector ────────────────────────
 
     This document contains confidential information and privileged material
     for the sole use of those authorized by True Fitness.  Any review, use,
@@ -11,10 +11,10 @@
 
 ───────────────────────────────────────────────────────────────────────────────
 
-    Project:    M5 Salutron-Phantom-Detecter (M5-SPD)
+    Project:    M5 Salutron-Phantom-Detector (M5-SPD)
     Author:     Mark Doane
     Date:       12/30/20
-    File:       STS.cpp               -SaluTron-Sniffer unit functions.
+    File:       Unit.cpp              -Salutron-Phantom-Detector unit functions.
     Software:   0121400               -Software number.
     Board:      M5Stick-C             -Color Display, WiFi, Bluetooth, Three switchs, Red & Ir LEDs, IMU, PMU, RTC, Various I/O.
                                        will include an external 18650 Hat, and a proto Hat with the µSD data logger.  Interface

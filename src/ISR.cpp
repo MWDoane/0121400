@@ -1,5 +1,5 @@
 /*
-───────────────────────── M5 Salutron-Phantom-Detecter ────────────────────────
+───────────────────────── M5 Salutron-Phantom-Detector ────────────────────────
 
     This document contains confidential information and privileged material
     for the sole use of those authorized by True Fitness.  Any review, use,
@@ -11,7 +11,7 @@
 
 ───────────────────────────────────────────────────────────────────────────────
 
-    Project:    M5 Salutron-Phantom-Detecter (M5-SPD)
+    Project:    M5 Salutron-Phantom-Detector (M5-SPD)
     Author:     Mark Doane
     Date:       12/30/20
     File:       ISR.cpp               -Interrupt-Service-Routine functions.
@@ -74,25 +74,34 @@ Returns:        Nothing.
 void    IRAM_ATTR BTN_CHK_ISR(void)
 {   
     portENTER_CRITICAL(&GPIO_SYNC);
-    if(PBTN_DB_TMR!=CLEAR)
-    {
-        if(PULSE_CNT)
+//    if(PBTN_DB_TMR!=CLEAR)
+//    {
+        if(digitalRead(PBTN_F)==LOW)
         {
-            PULSE_CNT=CLEAR;  
-            PRV_PULSE_CNT=CLEAR;         
-            if((bitRead(UnitControl,LCD_BL_PWR_FLAG)==SET) && (bitRead(UnitControl,LCD_BL_PWR_FLAG)==SET))
+            if(PULSE_CNT)
             {
-                PMIC.setLDO3(2700);
-                PMIC.setLDO2(LCD_BL_DIM);
-                bitSet(UnitControl, LCD_BL_PWR_FLAG);
-                bitSet(UnitControl, LCD_CTRL_PWR_FLAG);            
-                LCD_ON_TMR=LCD_ON_TME;
-                String EventCount=String(PULSE_CNT);            
-                LCD.drawString(EventCount+"     ",55,25,2);   
-                PBTN_DB_TMR=PBTN_DB_TME;
+                PULSE_CNT=CLEAR;  
+                PRV_PULSE_CNT=CLEAR;         
+                if((bitRead(UnitControl,LCD_BL_PWR_FLAG)==SET) && (bitRead(UnitControl,LCD_BL_PWR_FLAG)==SET))
+                {
+                    PMIC.setLDO3(2700);
+                    PMIC.setLDO2(LCD_BL_DIM);
+                    bitSet(UnitControl, LCD_BL_PWR_FLAG);
+                    bitSet(UnitControl, LCD_CTRL_PWR_FLAG);            
+                    LCD_ON_TMR=LCD_ON_TME;
+                    String EventCount=String(PULSE_CNT);            
+                    LCD.drawString(EventCount+"     ",55,25,2);   
+                    PBTN_DB_TMR=PBTN_DB_TME;
+                }
             }
         }
-    }
+        if(digitalRead(PBTN_T)==LOW)
+        {
+            pinMode(RED_LED,OUTPUT);
+            digitalWrite(RED_LED,LOW);
+            LED_ON_TMR=LED_ON_TME;
+        }
+//    }
     portEXIT_CRITICAL(&GPIO_SYNC);        
     return;
 }
@@ -108,14 +117,14 @@ Returns:        Nothing.
 
 ───────────────────────────────────────────────────────────────────────────────
 */
-
+/*
 void    IRAM_ATTR SYS_CHK_ISR(void)
 {   
     portENTER_CRITICAL(&GPIO_SYNC);
     portEXIT_CRITICAL(&GPIO_SYNC);
     return;
 }
-
+*/
 /*
 ───────────────────────────────────────────────────────────────────────────────
 TiMeR-ChecK-ISR     When the hardare timer fire an interrupt, the 1mS TiMeRs
@@ -130,6 +139,14 @@ Returns:        Nothing.
 void    IRAM_ATTR TMR_CHK_ISR(void)
 {   
     portENTER_CRITICAL(&HW_TMR);
+
+//────────────────────────── SERVICE PUSH-BUTTON-DE-BOUNCE-TIMER ─────────────────────────────
+
+    if(PBTN_DB_TMR!=CLEAR)                          // Is the TiMeR CLEAR?
+    {   LED_ON_TMR--;   }                           // If not, service the TiMeR.
+
+
+//─────────────────────────────────────────────────────────────────────────────
 
 //────────────────────────── SERVICE LED-ON-TIMER ─────────────────────────────
 
@@ -150,20 +167,8 @@ void    IRAM_ATTR TMR_CHK_ISR(void)
 
 //────────────────────── SERVICE LCD-DISPLAY-ON-TIMER ─────────────────────────
 
-    if(LCD_ON_TMR==CLEAR)                                   // Is the LCD-ON-TiMeR CLEAR?
-    {                                                       // IF so,    
-        if(bitRead(UnitControl,LCD_BL_PWR_FLAG)==SET)
-        {
-            PMIC.setLDO2(LCD_BL_OFF);                       // Turn the LCD-Back-Light-OFF.
-            bitClear(UnitControl,LCD_BL_FLAG);          
-        }
-        if(bitRead(UnitControl,LCD_CTRL_PWR_FLAG)==SET)
-        {
-            PMIC.setLDO3(OFF);                              // Turn the LCD-Back-Light-OFF.
-            bitClear(UnitControl,LCD_CTRL_PWR_FLAG);          
-        }    
-    }
-    else
+
+    if(LCD_ON_TMR!=CLEAR)
     {   LCD_ON_TMR--;   }                                   // Else, service the TiMeR.
 
     portEXIT_CRITICAL(&HW_TMR);

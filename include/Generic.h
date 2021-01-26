@@ -1,5 +1,5 @@
 /*
-─────────────────────────────── M5 Sal-U-Sniff ────────────────────────────────
+───────────────────────── M5 Salutron-Phantom-Detector ────────────────────────
 
     This document contains confidential information and privileged material
     for the sole use of those authorized by True Fitness.  Any review, use,
@@ -11,7 +11,7 @@
 
 ───────────────────────────────────────────────────────────────────────────────
 
-    Project:    M5 Sal-U-Sniff (M5-SUS)
+    Project:    M5 Salutron-Phantom-Detector (M5-SPD)
     Author:     Mark Doane
     Date:       11/26/20
     File:       Generic.h

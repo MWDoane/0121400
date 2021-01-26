@@ -1,5 +1,5 @@
 /*
-───────────────────────── M5 Salutron-Phantom-Detecter ────────────────────────
+───────────────────────── M5 Salutron-Phantom-Detector ────────────────────────
 
     This document contains confidential information and privileged material
     for the sole use of those authorized by True Fitness.  Any review, use,
@@ -11,7 +11,7 @@
 
 ───────────────────────────────────────────────────────────────────────────────
 
-    Project:    M5 Salutron-Phantom-Detecter (M5-SPD)
+    Project:    M5 Salutron-Phantom-Detector (M5-SPD)
     Author:     Mark Doane
     Date:       12/30/20
     File:       Globals.h             -Contains system variables and function prototypes used in the entire program.
@@ -87,6 +87,17 @@ void    UnitWakeUp(void)
         I2C_AXP192          PMIC(I2C_AXP192_DEFAULT_ADDRESS, I2C);
 //─────────────────────────────────────────────────────────────────────────────  
 
+//────────────────────────── UNIT-CONTOL VARIABLES ────────────────────────────
+/*
+                    _Bool       INIT_PWR_UP_FLAG=SET;
+                    _Bool       UNIT_WUP_FLAG;
+                    _Bool       LCD_BL_PWR_FLAG;
+                    _Bool       LCD_CTRL_PWR_FLAG;
+                    _Bool       LCD_DSP_SCR_1;
+                    _Bool       LCD_DSP_SCR_2;
+                    _Bool       LCD_DSP_SCR_3;
+*/
+
 //─────────────────────────── ISR TIMER VARIABLES ─────────────────────────────
 
         portMUX_TYPE GPIO_SYNC=portMUX_INITIALIZER_UNLOCKED;    // Port-I/O interrupt synchronozation initialzer.
@@ -140,7 +151,8 @@ void    UnitWakeUp(void)
 
 //──────────────────────── GENERAL UNIT DEFINITIONS ───────────────────────────
 
-        volatile    uint32_t    UnitControl;                    // Unit-Status control & status.
+        volatile    uint32_t    UnitControl=INIT_PWR_UP;        // Unit-Status control & status.
+
 
 //─────────────────────────────────────────────────────────────────────────────
 
@@ -154,7 +166,7 @@ void    UnitWakeUp(void)
 //───────────────────────── ISR FUNCTION PROTOTYPES ───────────────────────────
 
 void    IRAM_ATTR   SAL_CHK_ISR(void);                          // CHecK-SALutron-Interrupt-Service-Routine.  
-void    IRAM_ATTR   SYS_CHK_ISR(void);                          // CHecK SYStem-Interrupt-Service Routine.
+//void    IRAM_ATTR   SYS_CHK_ISR(void);                          // CHecK SYStem-Interrupt-Service Routine.
 void    IRAM_ATTR   BTN_CHK_ISR(void);                          // CHecK BuTtoN-Interrupt-Service-Routine.
 void    IRAM_ATTR   TMR_CHK_ISR(void);                          // CHecK TiMeR-Interrupt-Service-Routine.
 
@@ -170,10 +182,12 @@ void    Unit_ULP_WakeUp(void);                                  // Prepare Unit 
 void    Unit_ULP_DeepSleep(void);                               // Prepare Unit to enter DeepSleep.
 void    setup(void)                                             // Setup Function Declaration.
 {
+    
+//if(bitRead(UnitControl,INIT_PWR_UP))
 
 //──────────────────────── M5STICK-C INITIALIZATION ───────────────────────────
 
-    M5.begin(CLEAR,CLEAR,CLEAR);    
+    M5.begin(CLEAR,CLEAR,CLEAR);
 
 //─────────────────────────────────────────────────────────────────────────────  
 
@@ -182,9 +196,9 @@ void    setup(void)                                             // Setup Functio
     pinMode(TXO_TO_LGR,OUTPUT);
     pinMode(RXI_FROM_LGR,INPUT);
     pinMode(RED_LED,OUTPUT);
-    pinMode(PBTN_F,INPUT_PULLUP);
-    pinMode(PBTN_T,INPUT_PULLUP);
-    pinMode(SYS_INT,INPUT_PULLUP);
+    pinMode(PBTN_F,INPUT);
+    pinMode(PBTN_T,INPUT);
+    pinMode(SYS_INT,INPUT);
     pinMode(SAL_PULSE,INPUT);
     pinMode(SAL_MODE,INPUT);
         
@@ -194,14 +208,14 @@ void    setup(void)                                             // Setup Functio
 
     if(bitRead(UnitControl,INIT_PWR_UP)==SET)
     {   attachInterrupt(SAL_PULSE,SAL_CHK_ISR,RISING);  }       // CHeck SALutron-sPULSE Interrupt input.
-    attachInterrupt(SYS_INT,SYS_CHK_ISR,FALLING);               // CHeck SYStem shared Interrupt input.
+//    attachInterrupt(SYS_INT,SYS_CHK_ISR,FALLING);               // CHeck SYStem shared Interrupt input.
     attachInterrupt(PBTN_F,BTN_CHK_ISR,FALLING);                // CHeck Push BuTtoN-Front Interrupt input.
     attachInterrupt(PBTN_T,BTN_CHK_ISR,FALLING);                // CHecK Push BuTtoN-Top Interrupt input.
 
-    HW_TMR_0=timerBegin(0, 80, true);
-    timerAttachInterrupt(HW_TMR_0,&TMR_CHK_ISR,true);
-    timerAlarmWrite(HW_TMR_0,1000,true);
-    timerAlarmEnable(HW_TMR_0);
+    HW_TMR_0=timerBegin(0, 80, true);                           // HardWare TiMeR-0, divider of 80, edge detect.
+    timerAttachInterrupt(HW_TMR_0,&TMR_CHK_ISR,true);           // Attach TMR-CHK-ISR to HW-TMR-0.
+    timerAlarmWrite(HW_TMR_0,1000,true);                        // Interrupt every 1mS.
+    timerAlarmEnable(HW_TMR_0);                                 // Enable the Interrupt.
 
 //─────────────────────────────────────────────────────────────────────────────  
 
@@ -219,19 +233,19 @@ void    setup(void)                                             // Setup Functio
 //─────────────────────────────────────────────────────────────────────────────  
 
 
-//─────────────────── Power-Management-IC INITIALIZATION ──────────────────────
+//─────────────────── POWER-MANAGEMENT-IC INITIALIZATION ──────────────────────
 
 #if(PMIC_STATE_T)    
     I2C_AXP192_InitDef  PMU_INIT= 
     {   
         .EXTEN=EXT_5V_OFF,                                      // Turn the EXTeral-5V ENable OFF.
         .BACKUP=RTC_BCKUP_ON,                                   // Turn the RTC-Battery-BaCK-UP-ON.
-        .DCDC1=3000,                                            // Set ESP32 primary valtage to 3.000Vdc.
-        .DCDC2=0,                                               // Set DC-DC-2 to 0Vdc. 
-        .DCDC3=0,                                               // Set DC-DC-3 to 0Vdc. 
+        .DCDC1=SYS_PWR_ON,                                      // Turn the SYStem-PoWeR-ON.
+        .DCDC2=OFF,                                             // Set DC-DC-2 to OFF. 
+        .DCDC3=OFF,                                             // Set DC-DC-3 to OFF. 
         .LDO2=LCD_BL_OFF,                                       // Turn the LCD-Back-Light-OFF.
-        .LDO3=2700,                                             // Set the LCD-Module voltage to 2.700Vdc.
-        .GPIO0=MIC_PWR_OFF,                                     // Turn the MIC-PoWeR-OFF.
+        .LDO3=LCD_CTRL_ON,                                      // Turn ON the LCD-ConTRoLler.
+        .GPIO0=GPIO_0_OFF,                                      // Turn OFF GPIO-0.
         .GPIO1=-1,                                              // GPIO-1, not used.    
         .GPIO2=-1,                                              // GPIO-2, not used.    
         .GPIO3=-1,                                              // GPIO-3, not used.    
@@ -304,19 +318,23 @@ void    setup(void)                                             // Setup Functio
 
 //    DisplaySplash();
 
-#if(DSP_LOGO_T)
+#if(DSP_SPLASH_T)
+    LCD_ON_TMR=LCD_ON_INIT_TME;
+    delay(10);
     LCD.begin();
     #if(VCP_STAT_T)
         VCP.println("Display Enabled.");
     #endif    
     delay(500);
+    bitSet(UnitControl,LCD_CTRL_PWR_FLAG);
     LCD.setRotation(1);
     LCD.fillScreen(BLUE);
     PMIC.setLDO2(LCD_BL_BRT);
+    bitSet(UnitControl,LCD_BL_PWR_FLAG);    
     LCD.pushImage(0, 12, logoWidth, logoHeight, (uint16_t *)TF_logo);
     LCD.setTextColor(YELLOW);
     delay(3000); 
-    LCD.drawString("M5-SPD   0121400-1.0.0",10,45,2);  
+    LCD.drawString("M5-SPD   0121400",10,45,2);  
     LCD.drawString(String(RTC_Date.Month)+"-"+ 
                    String(RTC_Date.Date)+"-" + 
                    String(RTC_Date.Year),10,60,2);
@@ -326,27 +344,6 @@ void    setup(void)                                             // Setup Functio
     LCD.fillScreen(BLACK);
     LCD.setTextColor(WHITE,BLACK);
 #endif
-
-#if(LCD_TXT_DSP_T)
-    LCD.begin();
-    VCP.println("Display Enabled.");
-    delay(500);
-    LCD.setRotation(1);
-    LCD.fillScreen(BLUE);
-    LCD.setTextColor(CYAN);
-    PMIC.setLDO2(LCD_BL_DIM);
-    LCD.drawString("TRUE FITNESS",4,5,4);
-    LCD.setTextColor(YELLOW);
-    LCD.drawString("M5-STS   REV-1.0.0",10,45,2);  
-    LCD.drawString(String(RTC_Date.Month)+"-"+ 
-                   String(RTC_Date.Date)+"-" + 
-                   String(RTC_Date.Year),10,60,2);
-    PMIC.setEXTEN(EXT_5V_ON);
-    delay(3000);
-    LCD.fillScreen(BLACK);
-    LCD.setTextColor(WHITE,BLACK);
-
-#endif    
 
 //─────────────────────────────────────────────────────────────────────────────
 
