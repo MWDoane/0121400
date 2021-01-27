@@ -70,7 +70,7 @@
         portMUX_TYPE HW_TMR=portMUX_INITIALIZER_UNLOCKED;       // HW-TiMeR interrupt synchronozation initialzer.
         hw_timer_t * HW_TMR_0=NULL;                             // Setup the HW-TiMeR-0.
 
-        volatile    uint32_t    AUTO_SLP_TMR;
+        volatile    uint32_t    AUTO_SLP_TMR;                   // No activity for 60 seconds.
         volatile    uint8_t     PBTN_DB_TMR=CLEAR;              // Push-BuTtoN-De-Bounce-TiMeR, 1mS intervals.      (Default=0)
         volatile    uint8_t     LED_ON_TMR=CLEAR;               // LED-ON-TiMeR 1mS intervals.                      (Default=0)
         volatile    uint16_t    LCD_ON_TMR=CLEAR;               // LCD-DiSPlay-TiMeR, 1mS intervals.                (Default=0)
@@ -142,6 +142,10 @@ void    setup(void)                                             // Setup Functio
 //──────────────────────── M5STICK-C INITIALIZATION ───────────────────────────
 
     M5.begin(CLEAR,CLEAR,CLEAR);
+    esp_wifi_init(NULL);
+    esp_wifi_deinit();
+    esp_bt_controller_deinit();
+
 
 //─────────────────────────────────────────────────────────────────────────────  
 

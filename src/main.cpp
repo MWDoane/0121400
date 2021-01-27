@@ -51,7 +51,7 @@ void loop(void)
       // Both the PULSE & MODE lines are HIGH.
       if(NoSalutronInput)
       {
-        if((PRV_PULSE_CNT=PULSE_CNT))
+        if((PRV_PULSE_CNT==PULSE_CNT))
         {
           if(SAL_SIG_DET)
           {
@@ -76,6 +76,7 @@ void loop(void)
       // Both PULSE & MODE lines are LOW.
       else if(SalutronContact)
         {
+
           LCD.drawString("Pulse Rate:",10,10,2);
           LCD.drawString("Count:",10,25,2);
           LCD.drawString("Mode:",10,40,2);
@@ -92,6 +93,7 @@ void loop(void)
 
           else if(!WHR)
           {
+            
             String PulseRate=String(HR_Value,0);
             if(!(PULSE_CNT>=(PRV_PULSE_CNT+3)))
               {   LCD.drawString("--   ",85,10,2);   }
@@ -101,6 +103,7 @@ void loop(void)
             LCD.drawString(EventCount+"     ",55,25,2);
             LCD.drawString("Contact ",50,40,2);
             CHR=SET;  WHR=CLEAR;
+            
           }  
         }
 
@@ -213,8 +216,10 @@ void loop(void)
       {
           if(LCD_BL_PWR_FLAG)
           {
+#if(LCD_BL_T)
               PMIC.setLDO2(LCD_BL_OFF);                                     // If so, Turn the LCD-Back-Light-OFF.
               PMIC.setLDO3(LCD_CTRL_OFF);
+#endif              
               LCD_BL_PWR_FLAG=CLEAR;                                        // CLEAR the LCD-Back-Light-FLAG.
           }
 
@@ -223,8 +228,10 @@ void loop(void)
       {
         if(!LCD_BL_PWR_FLAG)
         {
+#if(LCD_BL_T)          
           PMIC.setLDO3(LCD_CTRL_ON);                                      // Turn ON the LCD-ConTRoLler.                    
           PMIC.setLDO2(LCD_BL_DIM);       
+#endif          
           LCD_BL_PWR_FLAG=SET;
         }
       }

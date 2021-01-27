@@ -60,6 +60,7 @@
 #define     IMU_T               (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control of IMU-Testing.
 #define     DEEPSLEEP_T         (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control of DEEP-SLEEP-Testing.
 #define     PMIC_STATE_T        (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control of PMIC-Testing.
+#define     LCD_BL_T            (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control of the LCD-BackLight-Testing.
 #define     BIT_MACROS          (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control of the BIT-MACROS.
 
 //──────────────────────────── UNIT-MODULE NAMES ──────────────────────────────
@@ -109,6 +110,7 @@
 
 //───────────────────── ISR-TIMER DEFINITIONS ───────────────────────
 
+#define     AUTO_SLP_TME        (60000u)                    // AUOT-SLeeP-TiME in mS.
 #define     PBTN_DB_TME         (100u)                      // Push-BuTtoN-De-Bouce-TiME in mS.
 #define     LED_ON_TME          (15u)                       // LED-ON-TiME in mS.
 #define     LCD_ON_INIT_TME     (15000u)                    // LCD-DiSPlay-TiME in mS.
