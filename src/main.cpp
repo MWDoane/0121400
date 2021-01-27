@@ -129,16 +129,20 @@ void loop(void)
 //─────────────────────────────────────────────────────────────────────────────    
 
 #if(VCP_SD_LOG_T)
-      if((PULSE_CNT>=(PRV_PULSE_CNT+3)))
+      if(SAL_SIG_DET)
       {
-        M5.Rtc.GetTime(&RTC_Time);
+        RTC.GetTime(&RTC_Time);
         if (RTC_Time.Seconds!=PrevSecond)                                         // Have the seconds changed?
         {
-          PrevSecond=RTC_Time.Seconds;
-          M5.Rtc.GetData(&RTC_Date);
-          VCP.print(String(RTC_Date.Month)+"-");                                  // Print Month.
-          VCP.print(String(RTC_Date.Date)+"-");                                   // Print Date (day of month).
-          VCP.print(String(RTC_Date.Year)+",");                                   // Print Year.
+          RTC.GetData(&RTC_Date);                                        // Update all the RTC Date registers.
+          if(RTC_Date.Date != PrevDay)                                      // If this is a different day,
+          {                                                                 // Log the new day.
+            VCP.print(String(RTC_Date.Month)+"-"+ 
+                         String(RTC_Date.Date)+"-"+ 
+                         String(RTC_Date.Year)+"\r\n");
+            PrevDay=RTC_Date.Date;                                          // And set Previous Day to current day.
+          }
+
           VCP.print(String(RTC_Time.Hours)+":");                                  // Print hour.
           if (RTC_Time.Minutes<10)                                                // Are the minutes are < 10?
             { VCP.print('0'); }                                                   // If so, print leading '0' for minutes.
@@ -157,6 +161,7 @@ void loop(void)
           {   VCP.print("CHR\r\n");   }
           else if(!(CHR || WHR))
           {   VCP.print("-\r\n");   }
+          PrevSecond=RTC_Time.Seconds;
         }  
       }
 #endif
@@ -168,10 +173,10 @@ void loop(void)
 #if(SD_LOGGER_T)
       if(SAL_SIG_DET)
       {
-        M5.Rtc.GetTime(&RTC_Time);                                          // Update all the RTC Time registers.
+        RTC.GetTime(&RTC_Time);                                          // Update all the RTC Time registers.
         if (RTC_Time.Seconds != PrevSecond)                                 // If current second and previous second
         {                                                                   // are equal exit.
-          M5.Rtc.GetData(&RTC_Date);                                        // Update all the RTC Date registers.
+          RTC.GetData(&RTC_Date);                                        // Update all the RTC Date registers.
           if(RTC_Date.Date != PrevDay)                                      // If this is a different day,
           {                                                                 // Log the new day.
             SD_LGR.print(String(RTC_Date.Month)+"-"+ 
@@ -199,26 +204,27 @@ void loop(void)
         }
       }
 #endif      
-      if(LCD_ON_TMR==CLEAR)                                   // Is the LCD-ON-TiMeR CLEAR?
-      {                                                       // IF so,    
+
+//─────────────────────────────────────────────────────────────────────────────    
+// LCD ON Time Check:    
+//─────────────────────────────────────────────────────────────────────────────    
+
+      if(LCD_ON_TMR==CLEAR)                                                 // Is the LCD-ON-TiMeR CLEAR?
+      {
           if(LCD_BL_PWR_FLAG)
           {
-//              PMIC.setLDO2(LCD_BL_OFF);                       // Turn the LCD-Back-Light-OFF.
-              LCD_BL_PWR_FLAG=CLEAR;
+              PMIC.setLDO2(LCD_BL_OFF);                                     // If so, Turn the LCD-Back-Light-OFF.
+              PMIC.setLDO3(LCD_CTRL_OFF);
+              LCD_BL_PWR_FLAG=CLEAR;                                        // CLEAR the LCD-Back-Light-FLAG.
           }
-/*
-          if(LCD_CTRL_PWR_FLAG)
-          {
-              PMIC.setLDO3(LCD_CTRL_OFF);                     // Turn the LCD-Controller-OFF.
-              LCD_CTRL_PWR_FLAG=CLEAR;
-          }    
-*/
+
       }
       if(LCD_ON_TMR!=CLEAR)
       {
         if(!LCD_BL_PWR_FLAG)
         {
-//          PMIC.setLDO2(LCD_BL_DIM);                 
+          PMIC.setLDO3(LCD_CTRL_ON);                                      // Turn ON the LCD-ConTRoLler.                    
+          PMIC.setLDO2(LCD_BL_DIM);       
           LCD_BL_PWR_FLAG=SET;
         }
       }

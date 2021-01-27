@@ -36,23 +36,23 @@
 
 //────────────────────────────── ISR VARIABLES ────────────────────────────────
 
-    extern  volatile    uint32_t        SAL_START_TME;                      // 32-Bit, Current micros START-TiME in µS.         (Default=0)
-    extern  volatile    uint32_t        SAL_STOP_TME;                       // 32-Bit, ELAPSED-TiME in µS.                      (Default=0)
-    extern  volatile    uint32_t        SAL_ELAPSED_TME;                    // 32-Bit, ELAPSED-TiME in µS.                      (Default=0)
-    extern  volatile    uint32_t        PRV_PULSE_CNT;                      // PReVious-PULSE-CouNT.
-    extern  volatile    uint32_t        PULSE_CNT;
-    extern  volatile    _Bool           SAL_SIG_DET;
+extern  volatile    uint32_t        SAL_START_TME;                          // 32-Bit, Current micros START-TiME in µS.         (Default=0)
+extern  volatile    uint32_t        SAL_STOP_TME;                           // 32-Bit, ELAPSED-TiME in µS.                      (Default=0)
+extern  volatile    uint32_t        SAL_ELAPSED_TME;                        // 32-Bit, ELAPSED-TiME in µS.                      (Default=0)
+extern  volatile    uint32_t        PRV_PULSE_CNT;                          // PReVious-PULSE-CouNT.
+extern  volatile    uint32_t        PULSE_CNT;
+extern  volatile    _Bool           SAL_SIG_DET;
     
-    extern  volatile    uint8_t         PBTN_DB_TMR;                        // Push-BuTtoN-De-Bounce-TiMeR, 1mS intervals.      (Default=0)
-    extern  volatile    uint8_t         LED_ON_TMR;                         // LED-ON-TiMeR, 1mS intervals.                     (Default=0)
-    extern  volatile    uint16_t        LCD_ON_TMR;                         // LCD-ON-TiMeR, 1mS intervals.                     (Default=0)
-    extern  volatile    _Bool           LCD_BL_PWR_FLAG;
-    extern  volatile    _Bool           LCD_CTRL_PWR_FLAG;
+extern  volatile    uint8_t         PBTN_DB_TMR;                            // Push-BuTtoN-De-Bounce-TiMeR, 1mS intervals.      (Default=0)
+extern  volatile    uint8_t         LED_ON_TMR;                             // LED-ON-TiMeR, 1mS intervals.                     (Default=0)
+extern  volatile    uint16_t        LCD_ON_TMR;                             // LCD-ON-TiMeR, 1mS intervals.                     (Default=0)
+extern  volatile    _Bool           LCD_BL_PWR_FLAG;
+extern  volatile    _Bool           LCD_CTRL_PWR_FLAG;
 
-    extern              I2C_AXP192      PMIC;    
-    extern              M5Display       LCD;
-    extern              portMUX_TYPE    GPIO_SYNC;
-    extern              portMUX_TYPE    HW_TMR;
+extern              I2C_AXP192      PMIC;    
+extern              M5Display       LCD;
+extern              portMUX_TYPE    GPIO_SYNC;
+extern              portMUX_TYPE    HW_TMR;
 
 //────────────────────────────── ISR FUNCTIONS ────────────────────────────────
 

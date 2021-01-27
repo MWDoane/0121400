@@ -35,44 +35,11 @@
 
 //──────────────────────── RTC-DEEP-SLEEP VARIABLES ───────────────────────────
 
-    RTC_DATA_ATTR   _Bool   ULP_INIT_PWR_UP_FLAG;
+    RTC_DATA_ATTR   _Bool   DS_INIT_PWR_UP_FLAG;
 
 //─────────────────────────────────────────────────────────────────────────────  
 
-//─────────────────────────── UNIT-WAKEUP SERVICE ─────────────────────────────
 
-#if(DEEPSLEEP_T)
-void    UnitWakeUp(void)
-{
-    esp_sleep_wakeup_cause_t WAKEUP_SOURCE;
-    WAKEUP_SOURCE=esp_sleep_get_wakeup_cause();
-    switch(WAKEUP_SOURCE)
-    {
-        case ESP_SLEEP_WAKEUP_EXT0: 
-        {
-            
-            break;
-        }
-
-        case ESP_SLEEP_WAKEUP_EXT1:
-        {
-
-            break;
-        }
-
-        case ESP_SLEEP_WAKEUP_ULP: 
-        {
-
-            break;
-        }
-        default:
-        {
-//            Serial.printf("Wakeup was not caused by deep sleep: %d\n",WAKEUP_SOURCE);
-            break;
-        }
-    }
-}
-#endif
 
 //──────────────────── UNIT-PERIPHIAL CLASS DEFINITIONS ───────────────────────
 
@@ -231,7 +198,7 @@ void    setup(void)                                             // Setup Functio
         .DCDC2=OFF,                                             // Set DC-DC-2 to OFF. 
         .DCDC3=OFF,                                             // Set DC-DC-3 to OFF. 
         .LDO2=LCD_BL_OFF,                                       // Turn the LCD-Back-Light-OFF.
-        .LDO3=LCD_CTRL_ON,                                      // Turn ON the LCD-ConTRoLler.
+        .LDO3=LCD_CTRL_OFF,                                     // Turn ON the LCD-ConTRoLler.
         .GPIO0=GPIO_0_OFF,                                      // Turn OFF GPIO-0.
         .GPIO1=-1,                                              // GPIO-1, not used.    
         .GPIO2=-1,                                              // GPIO-2, not used.    
@@ -306,7 +273,12 @@ void    setup(void)                                             // Setup Functio
 //    DisplaySplash();
 
 #if(DSP_SPLASH_T)
-//    LCD_CTRL_PWR_FLAG=SET;    
+//    LCD_CTRL_PWR_FLAG=-CLEAR;    
+    if(!LCD_CTRL_PWR_FLAG)
+    {   
+        PMIC.setLDO3(LCD_CTRL_ON);
+        LCD_CTRL_PWR_FLAG=SET;
+    }
     LCD.begin();
     #if(VCP_STATE_T)
         VCP.println("Display Enabled.");

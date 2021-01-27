@@ -28,3 +28,47 @@
 
 ─────────────────────────────────────────────────────────────────────
 */
+
+#ifndef     _Init_h_
+#define     _Init_h_
+
+#include    "Constants.h"                                                   // Include Gloabal constants.
+
+//─────────────────────────── UNIT-WAKEUP SERVICE ─────────────────────────────
+
+#if(DEEPSLEEP_T)
+void    UnitWakeUp(void)
+{
+    esp_sleep_wakeup_cause_t WAKEUP_SOURCE;
+    WAKEUP_SOURCE=esp_sleep_get_wakeup_cause();
+    switch(WAKEUP_SOURCE)
+    {
+        case ESP_SLEEP_WAKEUP_EXT0: 
+        {
+            
+            break;
+        }
+
+        case ESP_SLEEP_WAKEUP_EXT1:
+        {
+
+            break;
+        }
+
+        case ESP_SLEEP_WAKEUP_ULP: 
+        {
+
+            break;
+        }
+        default:
+        {
+//            Serial.printf("Wakeup was not caused by deep sleep: %d\n",WAKEUP_SOURCE);
+            break;
+        }
+    }
+}
+#endif
+
+
+
+#endif
