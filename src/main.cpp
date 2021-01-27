@@ -46,27 +46,26 @@ void loop(void)
   {
     do 
     {
-
       // Check for No-Salutron Detection.
       // Both the PULSE & MODE lines are HIGH.
       if(NoSalutronInput)
       {
-        if((PRV_PULSE_CNT==PULSE_CNT))
+        if((PRVS_PULSE_CNT==CRNT_PULSE_CNT))
         {
-          if(SAL_SIG_DET)
+          if(SAL_sPULSE_DET)
           {
             LCD.drawString("Pulse Rate:",10,10,2);
             LCD.drawString("--   ",85,10,2);
             LCD.drawString("Count:",10,25,2);
-            String EventCount=String(PULSE_CNT);            
+            String EventCount=String(CRNT_PULSE_CNT);            
             LCD.drawString(EventCount+"     ",55,25,2);
             LCD.drawString("Mode:",10,40,2);
             LCD.drawString("--       ",50,40,2);
-            PRV_PULSE_CNT=PULSE_CNT;
-            CHR=CLEAR;
-            WHR=CLEAR;
+            PRVS_PULSE_CNT=CRNT_PULSE_CNT;
+            SAL_CHR_MODE=CLEAR;
+            SAL_WHR_MODE=CLEAR;
             HR_Value=CLEAR;
-            SAL_SIG_DET=CLEAR;
+//            SAL_sPULSE_DET=CLEAR;
             SAL_ELAPSED_TME=CLEAR;
           }
         }  
@@ -76,35 +75,38 @@ void loop(void)
       // Both PULSE & MODE lines are LOW.
       else if(SalutronContact)
         {
-
           LCD.drawString("Pulse Rate:",10,10,2);
           LCD.drawString("Count:",10,25,2);
           LCD.drawString("Mode:",10,40,2);
-
+/*
           if(WHR)
           {
             LCD.drawString("--   ",85,10,2);
-            String EventCount=String(PULSE_CNT);                   
+            String EventCount=String(CRNT_PULSE_CNT);                   
             LCD.drawString(EventCount+"     ",55,25,2);
             LCD.drawString("Wireless",50,40,2);
             CHR=SET;  WHR=CLEAR;            
-            PRV_PULSE_CNT=PULSE_CNT;                    
+            PRVS_PULSE_CNT=CRNT_PULSE_CNT;                    
           }
 
           else if(!WHR)
           {
-            
+*/            
             String PulseRate=String(HR_Value,0);
-            if(!(PULSE_CNT>=(PRV_PULSE_CNT+3)))
+            if(!(CRNT_PULSE_CNT>=(PRVS_PULSE_CNT+3)))
               {   LCD.drawString("--   ",85,10,2);   }
             else
               {   LCD.drawString(PulseRate+"   ",85,10,2);  }
-            String EventCount=String(PULSE_CNT);          
+            String EventCount=String(CRNT_PULSE_CNT);          
             LCD.drawString(EventCount+"     ",55,25,2);
             LCD.drawString("Contact ",50,40,2);
-            CHR=SET;  WHR=CLEAR;
+            if(!SAL_CHR_MODE)      
+            {
+              SAL_CHR_MODE=SET;  
+              SAL_WHR_MODE=CLEAR;        
+            }
             
-          }  
+//          }  
         }
 
         // Check for Salutron Wireless Detection.
@@ -112,18 +114,25 @@ void loop(void)
         // Contact Mode has priority.
         else if(SalutronWireless)
         {
+          LCD.drawString("Pulse Rate:",10,10,2);
+          LCD.drawString("Count:",10,25,2);
+          LCD.drawString("Mode:",10,40,2);
           String PulseRate=String(HR_Value,0);
           LCD.drawString("Pulse Rate:",10,10,2);
-          if(!(PULSE_CNT>=(PRV_PULSE_CNT+3)))
+          if(!(CRNT_PULSE_CNT>=(PRVS_PULSE_CNT+3)))
             {   LCD.drawString("--   ",85,10,2);    }
           else
             {   LCD.drawString(PulseRate+"  ",85,10,2);  }
           LCD.drawString("Count:",10,25,2);
-          String EventCount=String(PULSE_CNT);
+          String EventCount=String(CRNT_PULSE_CNT);
           LCD.drawString(EventCount+"     ",55,25,2);
           LCD.drawString("Mode:",10,40,2);
-          LCD.drawString("Wireless",50,40,2);      
-          CHR=CLEAR;  WHR=SET;        
+          LCD.drawString("Wireless",50,40,2);
+          if(!SAL_WHR_MODE)      
+          {
+            SAL_CHR_MODE=CLEAR;  
+            SAL_WHR_MODE=SET;        
+          }
         }
 
       Calculate_HR();
@@ -132,18 +141,18 @@ void loop(void)
 //─────────────────────────────────────────────────────────────────────────────    
 
 #if(VCP_SD_LOG_T)
-      if(SAL_SIG_DET)
+      if(SAL_sPULSE_DET)
       {
         RTC.GetTime(&RTC_Time);
         if (RTC_Time.Seconds!=PrevSecond)                                         // Have the seconds changed?
         {
-          RTC.GetData(&RTC_Date);                                        // Update all the RTC Date registers.
-          if(RTC_Date.Date != PrevDay)                                      // If this is a different day,
-          {                                                                 // Log the new day.
+          RTC.GetData(&RTC_Date);                                                 // Update all the RTC Date registers.
+          if(RTC_Date.Date != PrevDay)                                            // If this is a different day,
+          {                                                                       // Log the new day.
             VCP.print(String(RTC_Date.Month)+"-"+ 
                          String(RTC_Date.Date)+"-"+ 
                          String(RTC_Date.Year)+"\r\n");
-            PrevDay=RTC_Date.Date;                                          // And set Previous Day to current day.
+            PrevDay=RTC_Date.Date;                                               // And set Previous Day to current day.
           }
 
           VCP.print(String(RTC_Time.Hours)+":");                                  // Print hour.
@@ -153,17 +162,18 @@ void loop(void)
           if (RTC_Time.Seconds<10)                                                // Are the seconds are < 10?
             { VCP.print('0'); }                                                   // Print leading '0' for seconds.
           VCP.print(String(RTC_Time.Seconds)+",");                                // Else, print seconds.
-          if(!(PULSE_CNT>=(PRV_PULSE_CNT+3)))
+          if(!(CRNT_PULSE_CNT>=(PRVS_PULSE_CNT+3)))
           {   VCP.printf("-,");    }
           else
           {   VCP.printf("%d,",(uint)HR_Value);   }
-          VCP.printf("%d,",(uint)PULSE_CNT);
-          if(WHR)
+          VCP.printf("%d,",(uint)CRNT_PULSE_CNT);
+          if(SAL_WHR_MODE)
           { VCP.print("WHR\r\n"); }
-          if(CHR)
+          if(SAL_CHR_MODE)
           {   VCP.print("CHR\r\n");   }
-          else if(!(CHR || WHR))
+          else if(!(SAL_CHR_MODE || SAL_WHR_MODE))
           {   VCP.print("-\r\n");   }
+          VCP.printf("%d,",LCD_ON_TMR);
           PrevSecond=RTC_Time.Seconds;
         }  
       }
@@ -174,7 +184,7 @@ void loop(void)
 //─────────────────────────────────────────────────────────────────────────────    
 
 #if(SD_LOGGER_T)
-      if(SAL_SIG_DET)
+      if(SAL_sPULSE_DET)
       {
         RTC.GetTime(&RTC_Time);                                          // Update all the RTC Time registers.
         if (RTC_Time.Seconds != PrevSecond)                                 // If current second and previous second
@@ -195,12 +205,12 @@ void loop(void)
             { SD_LGR.print("0"); }                                          // If so, send out a leading '0' for seconds.
           SD_LGR.print(String(RTC_Time.Seconds)+",");                       // Else, log the seconds.
           SD_LGR.printf("%d,",(uint)HR_Value);                              // Log the current Hear-Rate-Value.
-          SD_LGR.printf("%d,",(uint)PULSE_CNT);                             // Log the current pulse count.
-          if(WHR)
+          SD_LGR.printf("%d,",(uint)CRNT_PULSE_CNT);                        // Log the CuRreNT-PULSE-CouNT.
+          if(SAL_WHR_MODE)
           { SD_LGR.print("WHR"); }
-          if(CHR)
+          if(SAL_CHR_MODE)
           {   SD_LGR.print("CHR");   }
-          else if((!CHR)||(!WHR))
+          else if((!SAL_CHR_MODE)||(!SAL_WHR_MODE))
             {   SD_LGR.print("-");   }
           SD_LGR.print("\r\n");
           PrevSecond=RTC_Time.Seconds;                                      // Set previous seconds to current seconds.
@@ -212,15 +222,17 @@ void loop(void)
 // LCD ON Time Check:    
 //─────────────────────────────────────────────────────────────────────────────    
 
-      if(LCD_ON_TMR==CLEAR)                                                 // Is the LCD-ON-TiMeR CLEAR?
+#if(LCD_BL_T)
+      if(LCD_ON_TMR==CLEAR)                                                       // Is the LCD-ON-TiMeR CLEAR?
       {
           if(LCD_BL_PWR_FLAG)
           {
-#if(LCD_BL_T)
+
               PMIC.setLDO2(LCD_BL_OFF);                                     // If so, Turn the LCD-Back-Light-OFF.
               PMIC.setLDO3(LCD_CTRL_OFF);
-#endif              
+              LED_EN_FLAG=CLEAR;
               LCD_BL_PWR_FLAG=CLEAR;                                        // CLEAR the LCD-Back-Light-FLAG.
+              LCD_CTRL_PWR_FLAG=CLEAR;                                      // CLEAR the LCD-ConTRoLler-PoWeR-FLAG.              
           }
 
       }
@@ -228,15 +240,16 @@ void loop(void)
       {
         if(!LCD_BL_PWR_FLAG)
         {
-#if(LCD_BL_T)          
           PMIC.setLDO3(LCD_CTRL_ON);                                      // Turn ON the LCD-ConTRoLler.                    
           PMIC.setLDO2(LCD_BL_DIM);       
-#endif          
+          LED_EN_FLAG=SET;
           LCD_BL_PWR_FLAG=SET;
+          LCD_CTRL_PWR_FLAG=SET;                                           // SET the LCD-ConTRoLler-PoWeR-FLAG.                        
         }
       }
+#endif      
     } while(digitalRead(SAL_PULSE)==LOW);    
-    delay(MAX_SAL_SIG_TME);
+//    delay(MAX_SAL_SIG_TME);
   }    
 }
 /*END OF FILE */

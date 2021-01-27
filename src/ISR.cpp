@@ -50,11 +50,15 @@ void    IRAM_ATTR SAL_CHK_ISR(void)
     SAL_STOP_TME=micros();
     SAL_ELAPSED_TME=(SAL_STOP_TME-SAL_START_TME);    
     SAL_START_TME=micros();
-    pinMode(RED_LED,OUTPUT);
-    digitalWrite(RED_LED,LOW);
-    LED_ON_TMR=LED_ON_TME;
-    PULSE_CNT++;
-    SAL_SIG_DET=SET;
+    if(LED_EN_FLAG)
+    {
+        pinMode(RED_LED,OUTPUT);
+        digitalWrite(RED_LED,LOW);
+        LED_ON_TMR=LED_ON_TME;
+    }
+    SAL_HIGH_TMR=MAX_SAL_SIG_TME;
+    CRNT_PULSE_CNT++;
+    SAL_sPULSE_DET=SET;
     portEXIT_CRITICAL(&GPIO_SYNC);    
     return;
 }
@@ -80,16 +84,16 @@ void    IRAM_ATTR BTN_CHK_ISR(void)
         {
             if(!LCD_BL_PWR_FLAG)
             {
-                LCD_ON_TMR=LCD_ON_TME;                
+                LCD_ON_TMR=LCD_ON_TME;
                 portEXIT_CRITICAL(&GPIO_SYNC);        
                 return;
             }
-            if(PULSE_CNT)
+            if(CRNT_PULSE_CNT)
             {
-                PULSE_CNT=CLEAR;  
-                PRV_PULSE_CNT=CLEAR;         
+                CRNT_PULSE_CNT=CLEAR;  
+                PRVS_PULSE_CNT=CLEAR;         
                 LCD_ON_TMR=LCD_ON_TME;
-                String EventCount=String(PULSE_CNT);            
+                String EventCount=String(CRNT_PULSE_CNT);            
                 LCD.drawString(EventCount+"        ",55,25,2);   
 //                PBTN_DB_TMR=PBTN_DB_TME;
             }
@@ -140,6 +144,7 @@ void    IRAM_ATTR TMR_CHK_ISR(void)
 
 //────────────────────────── SERVICE PUSH-BUTTON-DE-BOUNCE-TIMER ─────────────────────────────
 
+    digitalWrite(GPIO_0,HIGH);
     if(PBTN_DB_TMR!=CLEAR)                          // Is the TiMeR CLEAR?
     {   LED_ON_TMR--;   }                           // If not, service the TiMeR.
 
@@ -156,18 +161,32 @@ void    IRAM_ATTR TMR_CHK_ISR(void)
             pinMode(RED_LED,INPUT);                 // Set RED-LED pin back to an INPUT.
         }
     }
-    else
+    else if(LED_ON_TMR!=CLEAR)
     {   LED_ON_TMR--;   }                           // Else, service the TiMeR.
 
 
 //─────────────────────────────────────────────────────────────────────────────
 
+//──────────────────── SERVICE SALUTRON-PULSE-HIGH-TIMER ──────────────────────
+
+    if(SAL_HIGH_TMR!=CLEAR)
+    {   LCD_ON_TMR--;   }                           // Else, service the TiMeR.
+    else if(SAL_HIGH_TMR==CLEAR)
+    {   
+        if(SAL_sPULSE_DET)
+        {
+            SAL_sPULSE_DET=CLEAR;
+        }
+    }
+    
+//─────────────────────────────────────────────────────────────────────────────
 
 //────────────────────── SERVICE LCD-DISPLAY-ON-TIMER ─────────────────────────
 
-
     if(LCD_ON_TMR!=CLEAR)
-    {   LCD_ON_TMR--;   }                                   // Else, service the TiMeR.
+    {   LCD_ON_TMR--;   }                           // Else, service the TiMeR.
+    
+    digitalWrite(GPIO_0,LOW);
 
     portEXIT_CRITICAL(&HW_TMR);
     return;

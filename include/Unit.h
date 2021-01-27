@@ -40,16 +40,17 @@ extern  volatile    _Bool       INIT_PWR_UP_FLAG;
 extern  volatile    _Bool       UNIT_WUP_FLAG;
 extern  volatile    _Bool       LCD_BL_PWR_FLAG;
 extern  volatile    _Bool       LCD_CTRL_PWR_FLAG;
+extern  volatile    _Bool       LED_EN_FLAG;
 extern  volatile    _Bool       LCD_DSP_SCR_1;
 extern  volatile    _Bool       LCD_DSP_SCR_2;
 extern  volatile    _Bool       LCD_DSP_SCR_3;
 
-extern  volatile    uint32_t    PRV_PULSE_CNT;                              // PReVious-PULSE-CouNT.
-extern  volatile    uint32_t    PULSE_CNT;                                  // Accumulated PULSE-CouNT.
+extern  volatile    uint32_t    PRVS_PULSE_CNT;                             // PReVious-PULSE-CouNT.
+extern  volatile    uint32_t    CRNT_PULSE_CNT;                             // CuRreNT-PULSE-CouNT.
 extern  volatile    uint32_t    SAL_ELAPSED_TME;                            // 32-Bit, ELAPSED-TiME in µS.                      
-extern  volatile    _Bool       SAL_SIG_DET;                                // SALutron SIGnal-DETection.
-extern              _Bool       CHR;                                        // State of the SALutron-MODE line.              
-extern              _Bool       WHR;                                        // State of the SALutron-MODE line.                 
+extern  volatile    _Bool       SAL_sPULSE_DET;                             // SALutron sPULSE-DETection.                       (NOTE: 1=When Signal is Present, 0=If no Signal.)
+extern              _Bool       SAL_CHR_MODE;                               // SALutron-Contact-HR-MODE.
+extern              _Bool       SAL_WHR_MODE;                               // SALutron-Wireless-HR-MODE.
 extern              float       HR_Value;                                   // Calculated Heart-Rate.
 
 extern  volatile    uint16_t    LCD_ON_TMR;                                 // LCD-DiSPlay-TiMeR, 1mS intervals.                (Default=0)

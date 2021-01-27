@@ -108,19 +108,19 @@ Returns:        Nothing.
 
 void    DisplayDefault(void)
 {
-    PULSE_CNT=CLEAR;
+    CRNT_PULSE_CNT=CLEAR;
     LCD.drawString("Pulse Rate:",10,10,2);
     LCD.drawString("--   ",85,10,2);
     LCD.drawString("Count:",10,25,2);
-    String EventCount=String(PULSE_CNT);            
+    String EventCount=String(CRNT_PULSE_CNT);            
     LCD.drawString(EventCount+"     ",55,25,2);
     LCD.drawString("Mode:",10,40,2);
     LCD.drawString("--       ",50,40,2);
-    PRV_PULSE_CNT=PULSE_CNT;
-    CHR=CLEAR;
-    WHR=CLEAR;
+    PRVS_PULSE_CNT=CRNT_PULSE_CNT;
+    SAL_CHR_MODE=CLEAR;
+    SAL_WHR_MODE=CLEAR;
     HR_Value=CLEAR;
-    SAL_SIG_DET=CLEAR;
+    SAL_sPULSE_DET=CLEAR;
     SAL_ELAPSED_TME=CLEAR;
 /*
     if(INIT_PWR_UP_FLAG)
@@ -128,7 +128,8 @@ void    DisplayDefault(void)
     if(INIT_PWR_UP_FLAG)
     { 
         LCD_ON_TMR=LCD_ON_INIT_TME;
-        INIT_PWR_UP_FLAG=CLEAR;        
+        INIT_PWR_UP_FLAG=CLEAR;
+        LED_EN_FLAG=SET;        
     }
 */
     return;

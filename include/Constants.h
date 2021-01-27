@@ -44,7 +44,7 @@
 #include    "Generic.h"
 #include    "stdio.h"
 #include    "time.h"
-#include    "TF_LOGO_3.h"                                       // True Fitness LOGO-3 table.
+#include    "TF_LOGO_3.h"
 
 //──────────────────── UNIT-TEST DEFINITIONS ────────────────────────
 
@@ -54,13 +54,13 @@
 #define     DSP_SPLASH_T        (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control to Display the Splash Screen.
 #define     DSP_MAIN_SCR        (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control to Display the Main SCReen.
 #define     DEBUG_IO_T          (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control DEBUG-Test-point-Inputs/Outputs.
-#define     SD_LOGGER_T         (_DISABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control of the SD Data-LOGGER-Testing.
+#define     SD_LOGGER_T         (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control of the SD Data-LOGGER-Testing.
 #define     RTC_T               (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control of the RTC-Testing.
 #define     SET_RTC_T           (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control of Setting-RTC-Testing.
 #define     IMU_T               (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control of IMU-Testing.
 #define     DEEPSLEEP_T         (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control of DEEP-SLEEP-Testing.
 #define     PMIC_STATE_T        (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control of PMIC-Testing.
-#define     LCD_BL_T            (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control of the LCD-BackLight-Testing.
+#define     LCD_BL_T            (_ENABLED)                      // Change the valve to (_ENABLED or _DISABLED) for control of the-Testing.
 #define     BIT_MACROS          (_DISABLED)                     // Change the valve to (_ENABLED or _DISABLED) for control of the BIT-MACROS.
 
 //──────────────────────────── UNIT-MODULE NAMES ──────────────────────────────
@@ -151,18 +151,7 @@
 
 //───────────────────── SALUTRON DEFINITIONS ────────────────────────
 
-#define     MAX_SAL_SIG_TME     (25u)                       // SALutron-SIGnal-TiME to determine if Salutron is active in mS.
-
-//─────────────────── UNIT-CONTROL DEFINITIONS ──────────────────────
-
-/*
-#define     SAL_sPULSE_DET      (8u)
-#define     SAL_WHR_MODE        (9u)
-#define     SAL_CHR_MODE        (10u)
-#define     PRVS_PULSE_CNT      (8u)
-#define     CRNT_PULSE_CNT      (8u)
-*/
-
+#define     MAX_SAL_SIG_TME     (50u)                       // SALutron-SIGnal-TiME to determine if Salutron is active in mS.
 
 //──────────────────── DEEP-SLEEP DEFINITIONS ───────────────────────
 

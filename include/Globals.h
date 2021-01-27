@@ -39,8 +39,6 @@
 
 //─────────────────────────────────────────────────────────────────────────────  
 
-
-
 //──────────────────── UNIT-PERIPHIAL CLASS DEFINITIONS ───────────────────────
 
         RTC_TimeTypeDef     RTC_Time;
@@ -60,6 +58,7 @@
         volatile    _Bool       UNIT_RUN_FLAG;        
         volatile    _Bool       LCD_BL_PWR_FLAG;
         volatile    _Bool       LCD_CTRL_PWR_FLAG;
+        volatile    _Bool       LED_EN_FLAG;
         volatile    _Bool       LCD_DSP_SCR_1;
         volatile    _Bool       LCD_DSP_SCR_2;
         volatile    _Bool       LCD_DSP_SCR_3;
@@ -79,18 +78,18 @@
 
 //──────────────────────────── SALUTRON VARIABLES ─────────────────────────────
 
-        volatile    uint16_t    SALUTRON_MODE=CLEAR;            // SALUTRON-MODE register.                          (Default=0)
-        volatile    uint32_t    SAL_START_TME=CLEAR;            // SALutron-sPulse START-TiME.                      (Default=0)
-        volatile    uint32_t    SAL_STOP_TME=CLEAR;             // SALutron-sPulse STOP-TiME.                       (Default=0)
-        volatile    uint32_t    SAL_ELAPSED_TME=CLEAR;          // SALutron-sPulse ELAPSED-TiME.                    (Default=0)
-        volatile    uint32_t    SAL_HIGH_TME=CLEAR;             // SALutron-sPulse START-TiME.                      (Default=0)
-        volatile    _Bool       SAL_SIG_DET=CLEAR;              // SALutron SIGnal-DETection.                       (NOTE: 1=When a Signal is Present, Default=0)
-                    _Bool       CHR=CLEAR;                      // State of the SALutron-MODE line.                 (Default=0)
-                    _Bool       WHR=CLEAR;                      // State of the SALutron-MODE line.                 (Default=0)
+        volatile    uint16_t    SALUTRON_MODE;                  // SALUTRON-MODE register.
+        volatile    uint32_t    SAL_START_TME;                  // SALutron-sPulse START-TiME.
+        volatile    uint32_t    SAL_STOP_TME;                   // SALutron-sPulse STOP-TiME.
+        volatile    uint32_t    SAL_ELAPSED_TME;                // SALutron-sPulse ELAPSED-TiME.
+        volatile    uint32_t    SAL_HIGH_TMR;                   // SALutron-sPulse START-TiME.
+        volatile    _Bool       SAL_sPULSE_DET=CLEAR;           // SALutron sPULSE-DETection.                       (NOTE: 1=When Signal is Present, 0=If no Signal.)
+                    _Bool       SAL_CHR_MODE=CLEAR;             // SALutron-Contact-HR-MODE.
+                    _Bool       SAL_WHR_MODE;                   // SALutron-Wireless-HR-MODE.
                     float       HR_Value=CLEAR;                 // Calculated Heart-Rate.                           (Default=0)
 
-        volatile    uint32_t    PRV_PULSE_CNT=CLEAR;            // PReVious-PULSE-CouNT.                            (Default=0)
-        volatile    uint32_t    PULSE_CNT=CLEAR;                // Accumulated PULSE-CouNT.                         (Default=0)
+        volatile    uint32_t    PRVS_PULSE_CNT;                 // PReViouS-PULSE-CouNT.
+        volatile    uint32_t    CRNT_PULSE_CNT;                 // CuRrent-PULSE-CouNT.
 
 //─────────────────────────────────────────────────────────────────────────────  
 
@@ -145,8 +144,7 @@ void    setup(void)                                             // Setup Functio
     esp_wifi_init(NULL);
     esp_wifi_deinit();
     esp_bt_controller_deinit();
-
-
+    
 //─────────────────────────────────────────────────────────────────────────────  
 
 //──────────────────────── PORT PIN INITIALIZATION ────────────────────────────
@@ -165,10 +163,10 @@ void    setup(void)                                             // Setup Functio
 //──────────────────── INTERRUPT SET-UP INITIALIZATION ────────────────────────
 
     if(INIT_PWR_UP_FLAG)
-    {   attachInterrupt(SAL_PULSE,SAL_CHK_ISR,RISING);  }       // CHeck SALutron-sPULSE Interrupt input.
-    attachInterrupt(SYS_INT,SYS_CHK_ISR,FALLING);               // CHeck SYStem shared Interrupt input.
-    attachInterrupt(PBTN_F,BTN_CHK_ISR,FALLING);                // CHeck Push BuTtoN-Front Interrupt input.
-    attachInterrupt(PBTN_T,BTN_CHK_ISR,FALLING);                // CHecK Push BuTtoN-Top Interrupt input.
+    {   attachInterrupt(SAL_PULSE,&SAL_CHK_ISR,RISING);  }       // CHeck SALutron-sPULSE Interrupt input.
+    attachInterrupt(SYS_INT,&SYS_CHK_ISR,FALLING);               // CHeck SYStem shared Interrupt input.
+    attachInterrupt(PBTN_F,&BTN_CHK_ISR,FALLING);                // CHeck Push BuTtoN-Front Interrupt input.
+    attachInterrupt(PBTN_T,&BTN_CHK_ISR,FALLING);                // CHecK Push BuTtoN-Top Interrupt input.
 
     HW_TMR_0=timerBegin(0, 80, true);                           // HardWare TiMeR-0, divider of 80, edge detect.
     timerAttachInterrupt(HW_TMR_0,&TMR_CHK_ISR,true);           // Attach TMR-CHK-ISR to HW-TMR-0.
@@ -237,18 +235,18 @@ void    setup(void)                                             // Setup Functio
     PrevSecond=-1;
 
 #if(SET_RTC_T)
-//    uint8_t hh = conv2d(__TIME__), 
-//    uint8_t mm = conv2d(__TIME__ + 3), 
-//    uint8_t ss = conv2d(__TIME__ + 6);                                              // Get H, M, S from compile time
-//    RTC_Time.Hours   = hh;
-//    RTC_Time.Minutes = mm;
-//    RTC_Time.Seconds = ss;
-    RTC_Time.Hours   = 15;
-    RTC_Time.Minutes = 39;
+//    RTC_Time.Hours=conv2d(__TIME__), 
+//    RTC_Time.Minutes=conv2d(__TIME__ + 3), 
+//    RTC_Time.Seconds=conv2d(__TIME__ + 6);                                              // Get H, M, S from compile time
+//    RTC_Time.Hours=hh;
+//    RTC_Time.Minutes=mm;
+//    RTC_Time.Seconds=ss;
+    RTC_Time.Hours   = 11;
+    RTC_Time.Minutes = 10;
     RTC_Time.Seconds = 00;
     M5.Rtc.SetTime(&RTC_Time);
     RTC_Date.Month=01;
-    RTC_Date.Date=26;
+    RTC_Date.Date=27;
     RTC_Date.Year=2021;
     M5.Rtc.SetData(&RTC_Date);
 #endif
@@ -384,24 +382,27 @@ void    setup(void)                                             // Setup Functio
 
 //    DisplayDefault();
 #if(DSP_MAIN_SCR)
-    PULSE_CNT=CLEAR;
+    CRNT_PULSE_CNT=CLEAR;
     LCD.drawString("Pulse Rate:",10,10,2);
     LCD.drawString("--   ",85,10,2);
     LCD.drawString("Count:",10,25,2);
-    String EventCount=String(PULSE_CNT);            
+    String EventCount=String(CRNT_PULSE_CNT);            
     LCD.drawString(EventCount+"     ",55,25,2);
     LCD.drawString("Mode:",10,40,2);
     LCD.drawString("--       ",50,40,2);
-    PRV_PULSE_CNT=PULSE_CNT;
-    CHR=CLEAR;
-    WHR=CLEAR;
+    PRVS_PULSE_CNT=CRNT_PULSE_CNT;
+    SAL_CHR_MODE=CLEAR;
+    SAL_WHR_MODE=CLEAR;
     HR_Value=CLEAR;
-    SAL_SIG_DET=CLEAR;
+    SAL_sPULSE_DET=CLEAR;
     SAL_ELAPSED_TME=CLEAR;
+
+
     if(INIT_PWR_UP_FLAG)
-    {   attachInterrupt(SAL_PULSE,SAL_CHK_ISR,RISING);          // CHeck SALutron-sPULSE Interrupt input.
+    {   attachInterrupt(SAL_PULSE,&SAL_CHK_ISR,RISING);          // CHeck SALutron-sPULSE Interrupt input.
         LCD_ON_TMR=LCD_ON_INIT_TME;
-        INIT_PWR_UP_FLAG=CLEAR;        
+        INIT_PWR_UP_FLAG=CLEAR;
+        LED_EN_FLAG=SET;        
     }
 #endif    
 

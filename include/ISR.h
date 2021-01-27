@@ -39,15 +39,17 @@
 extern  volatile    uint32_t        SAL_START_TME;                          // 32-Bit, Current micros START-TiME in µS.         (Default=0)
 extern  volatile    uint32_t        SAL_STOP_TME;                           // 32-Bit, ELAPSED-TiME in µS.                      (Default=0)
 extern  volatile    uint32_t        SAL_ELAPSED_TME;                        // 32-Bit, ELAPSED-TiME in µS.                      (Default=0)
-extern  volatile    uint32_t        PRV_PULSE_CNT;                          // PReVious-PULSE-CouNT.
-extern  volatile    uint32_t        PULSE_CNT;
-extern  volatile    _Bool           SAL_SIG_DET;
+extern  volatile    uint32_t        SAL_HIGH_TMR;                           // 32-Bit, SALutron-pulse-HIGH-TiMR.                (Default=0)
+extern  volatile    uint32_t        PRVS_PULSE_CNT;                         // PReVious-PULSE-CouNT.
+extern  volatile    uint32_t        CRNT_PULSE_CNT;                         // CuRreNT-PULSE-CouNT.
+extern  volatile    _Bool           SAL_sPULSE_DET;                         // SALutron sPULSE-DETection.                       (NOTE: 1=When Signal is Present, 0=If no Signal.)
     
 extern  volatile    uint8_t         PBTN_DB_TMR;                            // Push-BuTtoN-De-Bounce-TiMeR, 1mS intervals.      (Default=0)
 extern  volatile    uint8_t         LED_ON_TMR;                             // LED-ON-TiMeR, 1mS intervals.                     (Default=0)
 extern  volatile    uint16_t        LCD_ON_TMR;                             // LCD-ON-TiMeR, 1mS intervals.                     (Default=0)
 extern  volatile    _Bool           LCD_BL_PWR_FLAG;
 extern  volatile    _Bool           LCD_CTRL_PWR_FLAG;
+extern  volatile    _Bool           LED_EN_FLAG;
 
 extern              I2C_AXP192      PMIC;    
 extern              M5Display       LCD;
