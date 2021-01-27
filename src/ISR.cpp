@@ -145,9 +145,11 @@ void    IRAM_ATTR TMR_CHK_ISR(void)
 //────────────────────────── SERVICE PUSH-BUTTON-DE-BOUNCE-TIMER ─────────────────────────────
 
     digitalWrite(GPIO_0,HIGH);
-    if(PBTN_DB_TMR!=CLEAR)                          // Is the TiMeR CLEAR?
-    {   LED_ON_TMR--;   }                           // If not, service the TiMeR.
+//    if(PBTN_DB_TMR!=CLEAR)                          // Is the TiMeR CLEAR?
+//    {   LED_ON_TMR--;   }                           // If not, service the TiMeR.
 
+    if(LCD_ON_TMR!=CLEAR)
+    {   LCD_ON_TMR--;   }                           // Else, service the TiMeR.
 
 //─────────────────────────────────────────────────────────────────────────────
 
@@ -183,8 +185,8 @@ void    IRAM_ATTR TMR_CHK_ISR(void)
 
 //────────────────────── SERVICE LCD-DISPLAY-ON-TIMER ─────────────────────────
 
-    if(LCD_ON_TMR!=CLEAR)
-    {   LCD_ON_TMR--;   }                           // Else, service the TiMeR.
+//    if(LCD_ON_TMR!=CLEAR)
+//    {   LCD_ON_TMR--;   }                           // Else, service the TiMeR.
     
     digitalWrite(GPIO_0,LOW);
 

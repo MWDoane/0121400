@@ -136,6 +136,7 @@ void loop(void)
         }
 
       Calculate_HR();
+
 //─────────────────────────────────────────────────────────────────────────────    
 // COM PORT TEST:     For Debugging whats getting written to the SD Card.
 //─────────────────────────────────────────────────────────────────────────────    
@@ -174,6 +175,8 @@ void loop(void)
           else if(!(SAL_CHR_MODE || SAL_WHR_MODE))
           {   VCP.print("-\r\n");   }
           VCP.printf("%d,",LCD_ON_TMR);
+          VCP.printf("%d,",LED_ON_TMR);
+          VCP.printf("%d,",SAL_HIGH_TMR);
           PrevSecond=RTC_Time.Seconds;
         }  
       }
